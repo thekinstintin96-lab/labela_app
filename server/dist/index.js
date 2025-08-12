@@ -25,6 +25,11 @@ app.post('/api/settings', async (req, res) => {
         pageMarginMm: { ...current.pageMarginMm, ...(incoming.pageMarginMm || {}) },
         gutterMm: { ...current.gutterMm, ...(incoming.gutterMm || {}) },
         captions: { ...current.captions, ...(incoming.captions || {}) },
+        styles: {
+            default: { ...(current.styles?.default || {}), ...(incoming.styles?.default || {}) },
+            alternative: { ...(current.styles?.alternative || {}), ...(incoming.styles?.alternative || {}) },
+            condition: incoming.styles?.condition || current.styles?.condition || 'discount',
+        },
     };
     await saveSettings(merged);
     res.json(merged);

@@ -11,6 +11,11 @@ export type Settings = {
   gutterMm: { x: number; y: number };
   qrSizeMm: number;
   captions: { brand: string; price: string; oldPrice: string; unitPrice: string; vat: string };
+  styles?: {
+    default: { backgroundColor: string; textColor: string; strokeColor?: string };
+    alternative: { backgroundColor: string; textColor: string; strokeColor?: string };
+    condition: 'discount';
+  };
 };
 
 export function SettingsPage() {
@@ -85,6 +90,25 @@ export function SettingsPage() {
             <TextField label="Old price caption" value={settings.captions.oldPrice} onChange={(v) => set('captions.oldPrice', v)} />
             <TextField label="Unit price caption" value={settings.captions.unitPrice} onChange={(v) => set('captions.unitPrice', v)} />
             <TextField label="VAT caption" value={settings.captions.vat} onChange={(v) => set('captions.vat', v)} />
+          </InlineGrid>
+        </Card.Section>
+      </Card>
+
+      <Card>
+        <Card.Header title="Styles" />
+        <Card.Section>
+          <InlineGrid columns={2} gap="400">
+            <Text as="h3" variant="headingSm">Default style</Text>
+            <div />
+            <TextField label="Background color" value={settings.styles?.default.backgroundColor || ''} onChange={(v) => set('styles.default.backgroundColor', v)} placeholder="#FFFFFF" />
+            <TextField label="Text color" value={settings.styles?.default.textColor || ''} onChange={(v) => set('styles.default.textColor', v)} placeholder="#000000" />
+            <TextField label="Stroke color" value={settings.styles?.default.strokeColor || ''} onChange={(v) => set('styles.default.strokeColor', v)} placeholder="#000000" />
+
+            <Text as="h3" variant="headingSm">Alternative style (applies on discount)</Text>
+            <div />
+            <TextField label="Background color" value={settings.styles?.alternative.backgroundColor || ''} onChange={(v) => set('styles.alternative.backgroundColor', v)} placeholder="#FFF3CD" />
+            <TextField label="Text color" value={settings.styles?.alternative.textColor || ''} onChange={(v) => set('styles.alternative.textColor', v)} placeholder="#000000" />
+            <TextField label="Stroke color" value={settings.styles?.alternative.strokeColor || ''} onChange={(v) => set('styles.alternative.strokeColor', v)} placeholder="#000000" />
           </InlineGrid>
         </Card.Section>
       </Card>

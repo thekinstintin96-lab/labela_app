@@ -22,6 +22,11 @@ export const defaultSettings: AppSettings = {
   gutterMm: { x: 3, y: 3 },
   qrSizeMm: 20,
   captions: defaultCaptions,
+  styles: {
+    default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },
+    alternative: { backgroundColor: '#FFF3CD', textColor: '#000000', strokeColor: '#000000' },
+    condition: 'discount',
+  },
 };
 
 export async function ensureDataDir(): Promise<void> {

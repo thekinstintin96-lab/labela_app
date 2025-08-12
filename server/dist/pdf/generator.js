@@ -129,8 +129,16 @@ export async function generatePdf(settings, rows) {
         const col = idxOnPage % env.grid.cols;
         const x0 = doc.page.margins.left + col * (env.label.width + env.grid.gapX);
         const y0 = doc.page.margins.top + row * (env.label.height + env.grid.gapY);
-        // Draw label boundary (optional for debugging)
-        // doc.rect(x0, y0, env.label.width, env.label.height).stroke('#DDDDDD');
+        // Determine style based on condition (discount => compareAt > price)
+        const hasDiscount = !!(item.compareAtPrice && item.compareAtPrice > item.price);
+        const style = hasDiscount && settings.styles?.condition === 'discount' ? settings.styles?.alternative : settings.styles?.default;
+        const bgColor = style?.backgroundColor || '#FFFFFF';
+        const textColor = style?.textColor || '#000000';
+        const strokeColor = style?.strokeColor || textColor;
+        // Background
+        doc.save();
+        doc.rect(x0, y0, env.label.width, env.label.height).fill(bgColor);
+        doc.restore();
         const padding = env.label.padding;
         const innerX = x0 + padding;
         const innerY = y0 + padding;
@@ -140,14 +148,14 @@ export async function generatePdf(settings, rows) {
         const leftColW = innerW - env.qrPx - env.qrGap;
         let cursorY = innerY;
         // Title: up to 2 lines, bold
-        doc.font(titleFont).fontSize(10);
+        doc.fillColor(textColor).font('Helvetica-Bold').fontSize(10);
         const titleWrapped = wrapText(doc, item.title, leftColW, 2);
         for (const line of titleWrapped.lines) {
             doc.text(line, innerX, cursorY, { width: leftColW, lineBreak: false });
             cursorY += doc.currentLineHeight();
         }
         // Brand line with caption
-        doc.font(textFont).fontSize(8);
+        doc.fillColor(textColor).font('Helvetica').fontSize(8);
         const brandText = `${settings.captions.brand}: ${item.brand}`;
         const brandEllipsis = wrapText(doc, brandText, leftColW, 1);
         // QR image aligned top with brand line
@@ -160,7 +168,7 @@ export async function generatePdf(settings, rows) {
         doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
         cursorY += doc.currentLineHeight();
         // Price bold
-        doc.font(titleFont).fontSize(14);
+        doc.fillColor(textColor).font('Helvetica-Bold').fontSize(14);
         let priceText = `${settings.captions.price}: ${formatCurrencyAT(item.price)}`;
         if (doc.widthOfString(priceText) > leftColW) {
             // ellipsize if needed
@@ -173,7 +181,7 @@ export async function generatePdf(settings, rows) {
         cursorY += doc.currentLineHeight();
         // Old price (strikethrough numeric part)
         if (item.compareAtPrice && item.compareAtPrice > item.price) {
-            doc.font(textFont).fontSize(9);
+            doc.fillColor(textColor).font('Helvetica').fontSize(9);
             const oldPriceLabel = `${settings.captions.oldPrice}: `;
             const oldPriceValue = formatCurrencyAT(item.compareAtPrice);
             const startX = innerX;
@@ -183,12 +191,14 @@ export async function generatePdf(settings, rows) {
             const valueWidth = doc.widthOfString(oldPriceValue);
             const valueX = startX + labelWidth;
             // draw strike-through over numeric part
-            doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor('#000000').stroke();
+            doc.save();
+            doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
+            doc.restore();
             cursorY += doc.currentLineHeight();
         }
         // Unit price
         if (item.unitPriceText) {
-            doc.font(textFont).fontSize(8);
+            doc.fillColor(textColor).font('Helvetica').fontSize(8);
             let upText = `${settings.captions.unitPrice}: ${item.unitPriceText}`;
             if (doc.widthOfString(upText) > leftColW) {
                 while (upText.length > 0 && doc.widthOfString(upText + '…') > leftColW) {
@@ -200,7 +210,7 @@ export async function generatePdf(settings, rows) {
             cursorY += doc.currentLineHeight();
         }
         // VAT
-        doc.font(textFont).fontSize(8);
+        doc.fillColor(textColor).font('Helvetica').fontSize(8);
         let vatText = `${settings.captions.vat}: ${item.vatAmountText}`;
         if (doc.widthOfString(vatText) > leftColW) {
             while (vatText.length > 0 && doc.widthOfString(vatText + '…') > leftColW) {
@@ -210,7 +220,7 @@ export async function generatePdf(settings, rows) {
         }
         doc.text(vatText, innerX, cursorY, { width: leftColW, lineBreak: false });
         cursorY += doc.currentLineHeight();
-        // Overflow detection: if we exceeded innerH or any truncation happened
+        // Overflow detection
         let overflowReason;
         const exceededHeight = cursorY > innerY + innerH;
         if (exceededHeight)

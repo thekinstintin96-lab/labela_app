@@ -6,6 +6,12 @@ export type LabelCaptions = {
   vat: string;
 };
 
+export type LabelStyle = {
+  backgroundColor: string; // e.g., #FFFFFF
+  textColor: string; // e.g., #000000
+  strokeColor?: string; // optional line color
+};
+
 export type AppSettings = {
   storeDomain: string; // e.g., mystore.myshopify.com
   vatRate: number; // 0.20
@@ -15,6 +21,12 @@ export type AppSettings = {
   gutterMm: { x: number; y: number };
   qrSizeMm: number;
   captions: LabelCaptions;
+  styles?: {
+    default: LabelStyle;
+    alternative: LabelStyle;
+    // when to apply alternative style: if item has a discount (compare_at > price)
+    condition: 'discount';
+  };
 };
 
 export type CsvProductRow = {
