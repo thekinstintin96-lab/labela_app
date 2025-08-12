@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Form, FormLayout, InlineGrid, Text, TextField, Button, BlockStack } from '@shopify/polaris';
+import { Card, InlineGrid, Text, TextField, Button, BlockStack } from '@shopify/polaris';
 import axios from 'axios';
 
 export type Settings = {
@@ -55,12 +55,10 @@ export function SettingsPage() {
       <Card>
         <BlockStack gap="300">
           <Text as="h3" variant="headingMd">General</Text>
-          <Form>
-            <FormLayout>
-              <TextField label="Store domain" value={settings.storeDomain} onChange={(v) => set('storeDomain', v)} helpText="e.g., mystore.myshopify.com" />
-              <TextField label="VAT rate" type="number" value={String(settings.vatRate)} onChange={(v) => set('vatRate', Number(v))} helpText="e.g., 0.20 for 20%" />
-            </FormLayout>
-          </Form>
+          <BlockStack gap="200">
+            <TextField label="Store domain" value={settings.storeDomain} onChange={(v) => set('storeDomain', v)} helpText="e.g., mystore.myshopify.com" />
+            <TextField label="VAT rate" type="number" value={String(settings.vatRate)} onChange={(v) => set('vatRate', Number(v))} helpText="e.g., 0.20 for 20%" />
+          </BlockStack>
         </BlockStack>
       </Card>
 
