@@ -1,0 +1,63 @@
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { loadSettings, saveSettings } from './settings/store.js';
+import { parseCsv } from './csv/parse.js';
+import { generatePdf } from './pdf/generator.js';
+const app = express();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+app.use(express.json({ limit: '10mb' }));
+// Static public
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/public', express.static(path.join(__dirname, '../public')));
+app.get('/api/settings', async (_req, res) => {
+    const settings = await loadSettings();
+    res.json(settings);
+});
+app.post('/api/settings', async (req, res) => {
+    const incoming = req.body;
+    const current = await loadSettings();
+    const merged = {
+        ...current,
+        ...incoming,
+        pageMarginMm: { ...current.pageMarginMm, ...(incoming.pageMarginMm || {}) },
+        gutterMm: { ...current.gutterMm, ...(incoming.gutterMm || {}) },
+        captions: { ...current.captions, ...(incoming.captions || {}) },
+    };
+    await saveSettings(merged);
+    res.json(merged);
+});
+app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
+    if (!req.file)
+        return res.status(400).json({ error: 'No file uploaded' });
+    try {
+        const { rows, count, sample } = parseCsv(req.file.buffer);
+        res.json({ count, sample });
+    }
+    catch (err) {
+        res.status(400).json({ error: 'CSV parse error', details: String(err?.message || err) });
+    }
+});
+app.post('/api/generate', async (req, res) => {
+    try {
+        const body = req.body;
+        const settings = body.settings || (await loadSettings());
+        const rows = body.rows || [];
+        const result = await generatePdf(settings, rows);
+        const pdfUrl = result.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
+        const overflowCsvUrl = result.overflowPath ? result.overflowPath.replace(path.resolve(process.cwd(), 'public'), '/public') : null;
+        const response = { pdfUrl, overflowCsvUrl };
+        res.json(response);
+    }
+    catch (err) {
+        res.status(500).json({ error: 'Generation failed', details: String(err?.message || err) });
+    }
+});
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
+app.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on http://localhost:${PORT}`);
+});
+//# sourceMappingURL=index.js.map
