@@ -53,20 +53,20 @@ export function SettingsPage() {
   return (
     <BlockStack gap="400">
       <Card>
-        <Card.Header title="General" />
-        <Card.Section>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">General</Text>
           <Form>
             <FormLayout>
               <TextField label="Store domain" value={settings.storeDomain} onChange={(v) => set('storeDomain', v)} helpText="e.g., mystore.myshopify.com" />
               <TextField label="VAT rate" type="number" value={String(settings.vatRate)} onChange={(v) => set('vatRate', Number(v))} helpText="e.g., 0.20 for 20%" />
             </FormLayout>
           </Form>
-        </Card.Section>
+        </BlockStack>
       </Card>
 
       <Card>
-        <Card.Header title="Label layout (mm)" />
-        <Card.Section>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Label layout (mm)</Text>
           <InlineGrid columns={2} gap="400">
             <TextField label="Label width" type="number" value={String(settings.labelWidthMm)} onChange={(v) => set('labelWidthMm', Number(v))} />
             <TextField label="Label height" type="number" value={String(settings.labelHeightMm)} onChange={(v) => set('labelHeightMm', Number(v))} />
@@ -78,12 +78,12 @@ export function SettingsPage() {
             <TextField label="Gutter Y" type="number" value={String(settings.gutterMm.y)} onChange={(v) => set('gutterMm.y', Number(v))} />
             <TextField label="QR size" type="number" value={String(settings.qrSizeMm)} onChange={(v) => set('qrSizeMm', Number(v))} />
           </InlineGrid>
-        </Card.Section>
+        </BlockStack>
       </Card>
 
       <Card>
-        <Card.Header title="Label captions" />
-        <Card.Section>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Label captions</Text>
           <InlineGrid columns={2} gap="400">
             <TextField label="Brand caption" value={settings.captions.brand} onChange={(v) => set('captions.brand', v)} />
             <TextField label="Price caption" value={settings.captions.price} onChange={(v) => set('captions.price', v)} />
@@ -91,26 +91,26 @@ export function SettingsPage() {
             <TextField label="Unit price caption" value={settings.captions.unitPrice} onChange={(v) => set('captions.unitPrice', v)} />
             <TextField label="VAT caption" value={settings.captions.vat} onChange={(v) => set('captions.vat', v)} />
           </InlineGrid>
-        </Card.Section>
+        </BlockStack>
       </Card>
 
       <Card>
-        <Card.Header title="Styles" />
-        <Card.Section>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Styles</Text>
           <InlineGrid columns={2} gap="400">
-            <Text as="h3" variant="headingSm">Default style</Text>
+            <Text as="h4" variant="headingSm">Default style</Text>
             <div />
             <TextField label="Background color" value={settings.styles?.default.backgroundColor || ''} onChange={(v) => set('styles.default.backgroundColor', v)} placeholder="#FFFFFF" />
             <TextField label="Text color" value={settings.styles?.default.textColor || ''} onChange={(v) => set('styles.default.textColor', v)} placeholder="#000000" />
             <TextField label="Stroke color" value={settings.styles?.default.strokeColor || ''} onChange={(v) => set('styles.default.strokeColor', v)} placeholder="#000000" />
 
-            <Text as="h3" variant="headingSm">Alternative style (applies on discount)</Text>
+            <Text as="h4" variant="headingSm">Alternative style (applies on discount)</Text>
             <div />
             <TextField label="Background color" value={settings.styles?.alternative.backgroundColor || ''} onChange={(v) => set('styles.alternative.backgroundColor', v)} placeholder="#FFF3CD" />
             <TextField label="Text color" value={settings.styles?.alternative.textColor || ''} onChange={(v) => set('styles.alternative.textColor', v)} placeholder="#000000" />
             <TextField label="Stroke color" value={settings.styles?.alternative.strokeColor || ''} onChange={(v) => set('styles.alternative.strokeColor', v)} placeholder="#000000" />
           </InlineGrid>
-        </Card.Section>
+        </BlockStack>
       </Card>
 
       <Button primary onClick={onSave} loading={saving}>
