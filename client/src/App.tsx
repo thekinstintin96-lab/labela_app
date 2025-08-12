@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { AppProvider, Frame, Navigation, Page, Tabs } from '@shopify/polaris';
+import { useCallback, useState } from 'react';
+import { AppProvider, Frame, Page, Tabs, Box } from '@shopify/polaris';
 import '@shopify/polaris/build/esm/styles.css';
 import { GeneratePage } from './pages/GeneratePage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -7,8 +7,8 @@ import { SettingsPage } from './pages/SettingsPage';
 function App() {
   const [selected, setSelected] = useState(0);
   const tabs = [
-    { id: 'settings', content: 'Settings' },
-    { id: 'generate', content: 'Generate' },
+    { id: 'settings', content: 'Settings', panelID: 'settings-panel' },
+    { id: 'generate', content: 'Generate', panelID: 'generate-panel' },
   ];
   const handleTabChange = useCallback((index: number) => setSelected(index), []);
 
@@ -17,12 +17,9 @@ function App() {
       <Frame>
         <Page title="Shelf Label Generator">
           <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange} fitted>
-            <Tabs.Panel id="settings" title="Settings">
-              <SettingsPage />
-            </Tabs.Panel>
-            <Tabs.Panel id="generate" title="Generate">
-              <GeneratePage />
-            </Tabs.Panel>
+            <Box padding="400" id={tabs[selected].panelID}>
+              {selected === 0 ? <SettingsPage /> : <GeneratePage />}
+            </Box>
           </Tabs>
         </Page>
       </Frame>
