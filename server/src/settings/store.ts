@@ -26,7 +26,7 @@ export const defaultSettings: AppSettings = {
   captions: defaultCaptions,
   styles: {
     default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },
-    alternative: { backgroundColor: '#FFF3CD', textColor: '#000000', strokeColor: '#000000' },
+    alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff' },
     condition: 'discount',
   },
   fonts: {

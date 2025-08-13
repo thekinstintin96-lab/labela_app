@@ -209,9 +209,14 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
           const logoH = logoW / aspect;
           const logoX = x0 + mm(logoCfg.xMm);
           const logoY = y0 + mm(logoCfg.yMm);
-          if (logoCfg.opacity !== undefined) doc.save().opacity(logoCfg.opacity);
-          doc.image(buf, logoX, logoY, { width: logoW, height: logoH });
-          if (logoCfg.opacity !== undefined) doc.restore();
+          if (logoCfg.opacity !== undefined) {
+            doc.save();
+            doc.fillOpacity(logoCfg.opacity);
+            doc.image(buf, logoX, logoY, { width: logoW, height: logoH });
+            doc.restore();
+          } else {
+            doc.image(buf, logoX, logoY, { width: logoW, height: logoH });
+          }
         }
       } catch {}
     }
