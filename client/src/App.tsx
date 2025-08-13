@@ -16,11 +16,13 @@ function App() {
     <AppProvider i18n={{}}>
       <Frame>
         <Page title="Shelf Label Generator">
-          <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange} fitted>
-            <Box padding="400" id={tabs[selected].panelID}>
-              {selected === 0 ? <SettingsPage /> : <GeneratePage />}
-            </Box>
-          </Tabs>
+          <div style={{ height: 'calc(100vh - 64px)', overflow: 'auto' }}>
+            <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange} fitted>
+              <Box padding="400" id={tabs[selected].panelID}>
+                {selected === 0 ? <SettingsPage /> : <GeneratePage />}
+              </Box>
+            </Tabs>
+          </div>
         </Page>
       </Frame>
     </AppProvider>
