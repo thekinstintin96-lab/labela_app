@@ -38,6 +38,11 @@ app.post('/api/settings', async (req, res) => {
     },
     fonts: { ...(current.fonts || {}), ...(incoming.fonts || {}) },
     fieldWidthsPct: { ...(current.fieldWidthsPct || {}), ...(incoming.fieldWidthsPct || {}) },
+    brandLogo: {
+      original: { ...(current.brandLogo?.original || {}), ...(incoming.brandLogo?.original || {}) },
+      alternative: { ...(current.brandLogo?.alternative || {}), ...(incoming.brandLogo?.alternative || {}) },
+    },
+    diagonalStrikeForCompare: incoming.diagonalStrikeForCompare ?? current.diagonalStrikeForCompare ?? true,
   } as AppSettings;
   await saveSettings(merged);
   res.json(merged);

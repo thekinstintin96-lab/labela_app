@@ -34,6 +34,23 @@ export type Settings = {
     unitPrice: number;
     vat: number;
   };
+  brandLogo?: {
+    original?: {
+      path: string;
+      widthMm: number;
+      xMm: number;
+      yMm: number;
+      opacity: number;
+    };
+    alternative?: {
+      path: string;
+      widthMm: number;
+      xMm: number;
+      yMm: number;
+      opacity: number;
+    };
+  };
+  diagonalStrikeForCompare?: boolean;
 };
 
 export function SettingsPage() {
@@ -159,6 +176,39 @@ export function SettingsPage() {
             <TextField label="Old price font (pt)" type="number" value={String(settings.fonts?.oldPricePt ?? 9)} onChange={(v) => set('fonts.oldPricePt', Number(v))} />
             <TextField label="Unit price font (pt)" type="number" value={String(settings.fonts?.unitPricePt ?? 8)} onChange={(v) => set('fonts.unitPricePt', Number(v))} />
             <TextField label="VAT font (pt)" type="number" value={String(settings.fonts?.vatPt ?? 8)} onChange={(v) => set('fonts.vatPt', Number(v))} />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Brand logo (background)</Text>
+          <Text as="p">Upload your logo to the server and provide an absolute or server-relative path. Size preserves aspect ratio based on width.</Text>
+          <InlineGrid columns={2} gap="400">
+            <Text as="h4" variant="headingSm">Original style logo</Text>
+            <div />
+            <TextField label="Logo path" value={settings.brandLogo?.original?.path || ''} onChange={(v) => set('brandLogo.original.path', v)} placeholder="public/brand_logo.png" />
+            <TextField label="Width (mm)" type="number" value={String(settings.brandLogo?.original?.widthMm ?? 0)} onChange={(v) => set('brandLogo.original.widthMm', Number(v))} />
+            <TextField label="X (mm)" type="number" value={String(settings.brandLogo?.original?.xMm ?? 0)} onChange={(v) => set('brandLogo.original.xMm', Number(v))} />
+            <TextField label="Y (mm)" type="number" value={String(settings.brandLogo?.original?.yMm ?? 0)} onChange={(v) => set('brandLogo.original.yMm', Number(v))} />
+            <TextField label="Opacity (0-1)" type="number" value={String(settings.brandLogo?.original?.opacity ?? 0.2)} onChange={(v) => set('brandLogo.original.opacity', Number(v))} />
+
+            <Text as="h4" variant="headingSm">Alternative style logo</Text>
+            <div />
+            <TextField label="Logo path" value={settings.brandLogo?.alternative?.path || ''} onChange={(v) => set('brandLogo.alternative.path', v)} placeholder="public/brand_logo_alt.png" />
+            <TextField label="Width (mm)" type="number" value={String(settings.brandLogo?.alternative?.widthMm ?? 0)} onChange={(v) => set('brandLogo.alternative.widthMm', Number(v))} />
+            <TextField label="X (mm)" type="number" value={String(settings.brandLogo?.alternative?.xMm ?? 0)} onChange={(v) => set('brandLogo.alternative.xMm', Number(v))} />
+            <TextField label="Y (mm)" type="number" value={String(settings.brandLogo?.alternative?.yMm ?? 0)} onChange={(v) => set('brandLogo.alternative.yMm', Number(v))} />
+            <TextField label="Opacity (0-1)" type="number" value={String(settings.brandLogo?.alternative?.opacity ?? 0.2)} onChange={(v) => set('brandLogo.alternative.opacity', Number(v))} />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Compare price strike style</Text>
+          <InlineGrid columns={2} gap="400">
+            <TextField label="Diagonal strike for compare price (1=true, 0=false)" type="number" value={String(settings.diagonalStrikeForCompare ? 1 : 0)} onChange={(v) => set('diagonalStrikeForCompare', Number(v) === 1)} helpText="Set to 1 to draw a diagonal line through the compare-at price" />
           </InlineGrid>
         </BlockStack>
       </Card>

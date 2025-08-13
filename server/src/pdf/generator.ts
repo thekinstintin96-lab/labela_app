@@ -7,6 +7,7 @@ import { AppSettings, CsvProductRow, ParsedItem } from '../types/index.js';
 import { parsePrice } from '../csv/parse.js';
 import { computeUnitPrice, computeVatFromGross, formatCurrencyAT, sizeFromSkuOrOption } from './units.js';
 import { nanoid } from 'nanoid';
+import sizeOf from 'image-size';
 
 const OUT_DIR = path.resolve(process.cwd(), 'public/out');
 const A4 = { widthPt: 595.275590551, heightPt: 841.88976378 }; // 210x297 mm
@@ -146,6 +147,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       sizeText: size?.display,
       unitPriceText: unit?.text,
       vatAmountText: formatCurrencyAT(vat),
+      shortDescription: r.short_description_product?.trim() || undefined,
     });
   }
 
@@ -194,6 +196,27 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     const wUnit = (leftColW * (widths.unitPrice ?? 100)) / 100;
     const wVat = (leftColW * (widths.vat ?? 100)) / 100;
 
+    // Optional brand logo underlay
+    const hasDiscount = !!(item.compareAtPrice && item.compareAtPrice > item.price);
+    const logoCfg = hasDiscount ? settings.brandLogo?.alternative : settings.brandLogo?.original;
+    if (logoCfg?.path && logoCfg.widthMm > 0) {
+      try {
+        const absPath = path.isAbsolute(logoCfg.path) ? logoCfg.path : path.resolve(process.cwd(), logoCfg.path);
+        const buf = await fsp.readFile(absPath);
+        const dim = sizeOf(buf);
+        if (dim.width && dim.height) {
+          const aspect = dim.width / dim.height;
+          const logoW = mm(logoCfg.widthMm);
+          const logoH = logoW / aspect;
+          const logoX = x0 + mm(logoCfg.xMm);
+          const logoY = y0 + mm(logoCfg.yMm);
+          if (logoCfg.opacity !== undefined) doc.save().opacity(logoCfg.opacity);
+          doc.image(buf, logoX, logoY, { width: logoW, height: logoH });
+          if (logoCfg.opacity !== undefined) doc.restore();
+        }
+      } catch {}
+    }
+
     let cursorY = innerY;
 
     // Title: up to 2 lines, bold
@@ -201,6 +224,18 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     const titleWrapped = wrapText(doc, item.title, wTitle, 2);
     for (const line of titleWrapped.lines) {
       doc.text(line, innerX, cursorY, { width: wTitle, lineBreak: false });
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
+    }
+
+    // Optional short description (single line)
+    if (item.shortDescription) {
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
+      let desc = item.shortDescription;
+      if (doc.widthOfString(desc) > wTitle) {
+        while (desc.length > 0 && doc.widthOfString(desc + '…') > wTitle) desc = desc.slice(0, -1);
+        desc += '…';
+      }
+      doc.text(desc, innerX, cursorY, { width: wTitle, lineBreak: false });
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
@@ -248,7 +283,12 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       const valueX = startX + labelWidth;
       // draw strike-through over numeric part
       doc.save();
-      doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
+      if (settings.diagonalStrikeForCompare) {
+        const ascent = doc.currentLineHeight() * 0.8;
+        doc.moveTo(valueX, y + ascent).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
+      } else {
+        doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
+      }
       doc.restore();
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }

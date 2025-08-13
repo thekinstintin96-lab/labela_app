@@ -32,6 +32,10 @@ export type AppSettings = {
   // Additional layout controls
   lineGapPt?: number; // extra gap between lines in points
   qrOffsetMm?: { x: number; y: number }; // manual QR position adjuster
+  brandLogo?: {
+    original?: { path: string; widthMm: number; xMm: number; yMm: number; opacity?: number };
+    alternative?: { path: string; widthMm: number; xMm: number; yMm: number; opacity?: number };
+  };
   captions: LabelCaptions;
   styles?: {
     default: LabelStyle;
@@ -40,6 +44,7 @@ export type AppSettings = {
   };
   fonts?: LabelFonts;
   fieldWidthsPct?: { title: number; brand: number; price: number; oldPrice: number; unitPrice: number; vat: number };
+  diagonalStrikeForCompare?: boolean;
 };
 
 export type CsvProductRow = {
@@ -52,6 +57,7 @@ export type CsvProductRow = {
   "Variant Grams"?: string;
   "Option1 Value"?: string;
   "Image Src"?: string;
+  short_description_product?: string;
   // Other columns may exist
 };
 
@@ -65,6 +71,7 @@ export type ParsedItem = {
   sizeText?: string; // e.g., 500 ml, 0.5 L, 200 g, 0.2 kg
   unitPriceText?: string; // e.g., 3,20 € / L
   vatAmountText: string; // formatted amount per unit
+  shortDescription?: string;
   overflowReason?: string;
 };
 
