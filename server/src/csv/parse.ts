@@ -54,7 +54,10 @@ export function parseCsv(buffer: Buffer): { rows: CsvProductRow[]; count: number
 	}) as CsvProductRow[];
 
 	// filter out rows without price
-	const filtered = records.filter((r) => parsePrice(r['Variant Price']) !== undefined);
+	const filtered = records.filter((r) => {
+		const p = parsePrice(r['Variant Price']);
+		return p !== undefined && p > 0;
+	});
 	const post = postprocessRows(filtered);
 	return { rows: post, count: post.length, sample: post.slice(0, 5) };
 }

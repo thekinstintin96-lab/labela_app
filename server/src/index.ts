@@ -10,9 +10,10 @@ import { promises as fsp } from 'fs';
 import { nanoid } from 'nanoid';
 
 const app = express();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static public
 const __filename = fileURLToPath(import.meta.url);
@@ -110,7 +111,7 @@ app.post('/api/preview', async (req, res) => {
       Title: 'Sample Product Very Long Title To Test Wrapping',
       Vendor: 'BrandCo',
       'Variant SKU': 'SKU-TEST-500ML',
-      'Variant Price': '3,49',
+      'Variant Price': '3.49',
       'Variant Grams': '500',
       'Option1 Value': '500 ml',
       'Image Src': '',
@@ -118,12 +119,12 @@ app.post('/api/preview', async (req, res) => {
     } as any;
 
     // Original style (no discount)
-    const rowOriginal = { ...baseRow, 'Variant Compare At Price': '3,49' };
+    const rowOriginal = { ...baseRow, 'Variant Compare At Price': '3.49' };
     const r1 = await generatePdf(settings, [rowOriginal]);
     const url1 = r1.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
 
     // Alternative style (discount)
-    const rowAlt = { ...baseRow, 'Variant Compare At Price': '4,19' };
+    const rowAlt = { ...baseRow, 'Variant Compare At Price': '4.19' };
     const r2 = await generatePdf(settings, [rowAlt]);
     const url2 = r2.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
 
