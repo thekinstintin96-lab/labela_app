@@ -247,6 +247,11 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
 
     // Draw QR
     doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
+    if ((settings.qrBorderWidthPt || 0) > 0) {
+      doc.save();
+      doc.lineWidth(settings.qrBorderWidthPt || 0).strokeColor(strokeColor).rect(qrX, qrY, env.qrPx, env.qrPx).stroke();
+      doc.restore();
+    }
 
     cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
@@ -316,7 +321,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     if (item.shortDescription) {
       const wShort = (leftColW * ((settings.fieldWidthsPct?.shortDescription ?? 100) / 100));
       const maxLines = Math.max(1, settings.shortDescMaxLines ?? 1);
-      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.shortDescPt || fonts.brandPt);
       const wrapped = wrapText(doc, item.shortDescription, wShort, maxLines);
       for (const line of wrapped.lines) {
         doc.text(line, innerX, cursorY, { width: wShort, lineBreak: false });

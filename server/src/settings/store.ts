@@ -36,6 +36,7 @@ export const defaultSettings: AppSettings = {
     oldPricePt: 9,
     unitPricePt: 8,
     vatPt: 8,
+    shortDescPt: 8,
   },
   fieldWidthsPct: { title: 100, brand: 100, price: 100, oldPrice: 100, unitPrice: 100, vat: 100 },
   brandLogo: {
@@ -44,6 +45,7 @@ export const defaultSettings: AppSettings = {
   },
   diagonalStrikeForCompare: true,
   shortDescMaxLines: 1,
+  qrBorderWidthPt: 0,
 };
 
 export async function ensureDataDir(): Promise<void> {

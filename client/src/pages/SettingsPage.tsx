@@ -252,9 +252,19 @@ export function SettingsPage() {
       <Card>
         <BlockStack gap="300">
           <Text as="h3" variant="headingMd">Short description</Text>
-          <InlineGrid columns={2} gap="400">
+          <InlineGrid columns={3} gap="400">
             <TextField label="Max lines" type="number" value={String(settings.shortDescMaxLines ?? 1)} onChange={(v) => set('shortDescMaxLines', Number(v))} />
             <TextField label="Width %" type="number" value={String(settings.fieldWidthsPct?.shortDescription ?? 100)} onChange={(v) => set('fieldWidthsPct.shortDescription', Number(v))} />
+            <TextField label="Font size (pt)" type="number" value={String(settings.fonts?.shortDescPt ?? settings.fonts?.brandPt ?? 8)} onChange={(v) => set('fonts.shortDescPt', Number(v))} />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">QR Border</Text>
+          <InlineGrid columns={2} gap="400">
+            <TextField label="Border width (pt)" type="number" value={String(settings.qrBorderWidthPt ?? 0)} onChange={(v) => set('qrBorderWidthPt', Number(v))} />
           </InlineGrid>
         </BlockStack>
       </Card>

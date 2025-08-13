@@ -19,6 +19,7 @@ export type LabelFonts = {
   oldPricePt: number;
   unitPricePt: number;
   vatPt: number;
+  shortDescPt?: number;
 };
 
 export type AppSettings = {
@@ -29,6 +30,7 @@ export type AppSettings = {
   pageMarginMm: { top: number; right: number; bottom: number; left: number };
   gutterMm: { x: number; y: number };
   qrSizeMm: number;
+  qrBorderWidthPt?: number;
   // Additional layout controls
   lineGapPt?: number; // extra gap between lines in points
   qrOffsetMm?: { x: number; y: number }; // manual QR position adjuster
