@@ -39,6 +39,7 @@ export type AppSettings = {
     condition: 'discount';
   };
   fonts?: LabelFonts;
+  fieldWidthsPct?: { title: number; brand: number; price: number; oldPrice: number; unitPrice: number; vat: number };
 };
 
 export type CsvProductRow = {

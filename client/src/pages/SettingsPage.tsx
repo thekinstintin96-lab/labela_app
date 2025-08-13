@@ -26,6 +26,14 @@ export type Settings = {
   };
   lineGapPt?: number;
   qrOffsetMm?: { x: number; y: number };
+  fieldWidthsPct?: {
+    title: number;
+    brand: number;
+    price: number;
+    oldPrice: number;
+    unitPrice: number;
+    vat: number;
+  };
 };
 
 export function SettingsPage() {
@@ -121,6 +129,20 @@ export function SettingsPage() {
             <TextField label="Background color" value={settings.styles?.alternative.backgroundColor || ''} onChange={(v) => set('styles.alternative.backgroundColor', v)} placeholder="#FFF3CD" />
             <TextField label="Text color" value={settings.styles?.alternative.textColor || ''} onChange={(v) => set('styles.alternative.textColor', v)} placeholder="#000000" />
             <TextField label="Stroke color" value={settings.styles?.alternative.strokeColor || ''} onChange={(v) => set('styles.alternative.strokeColor', v)} placeholder="#000000" />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Field widths (%)</Text>
+          <InlineGrid columns={3} gap="400">
+            <TextField label="Title width %" type="number" value={String(settings.fieldWidthsPct?.title ?? 100)} onChange={(v) => set('fieldWidthsPct.title', Number(v))} />
+            <TextField label="Brand width %" type="number" value={String(settings.fieldWidthsPct?.brand ?? 100)} onChange={(v) => set('fieldWidthsPct.brand', Number(v))} />
+            <TextField label="Price width %" type="number" value={String(settings.fieldWidthsPct?.price ?? 100)} onChange={(v) => set('fieldWidthsPct.price', Number(v))} />
+            <TextField label="Old price width %" type="number" value={String(settings.fieldWidthsPct?.oldPrice ?? 100)} onChange={(v) => set('fieldWidthsPct.oldPrice', Number(v))} />
+            <TextField label="Unit price width %" type="number" value={String(settings.fieldWidthsPct?.unitPrice ?? 100)} onChange={(v) => set('fieldWidthsPct.unitPrice', Number(v))} />
+            <TextField label="VAT width %" type="number" value={String(settings.fieldWidthsPct?.vat ?? 100)} onChange={(v) => set('fieldWidthsPct.vat', Number(v))} />
           </InlineGrid>
         </BlockStack>
       </Card>

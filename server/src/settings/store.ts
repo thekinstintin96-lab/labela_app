@@ -37,6 +37,7 @@ export const defaultSettings: AppSettings = {
     unitPricePt: 8,
     vatPt: 8,
   },
+  fieldWidthsPct: { title: 100, brand: 100, price: 100, oldPrice: 100, unitPrice: 100, vat: 100 },
 };
 
 export async function ensureDataDir(): Promise<void> {

@@ -37,6 +37,7 @@ app.post('/api/settings', async (req, res) => {
       condition: incoming.styles?.condition || current.styles?.condition || 'discount',
     },
     fonts: { ...(current.fonts || {}), ...(incoming.fonts || {}) },
+    fieldWidthsPct: { ...(current.fieldWidthsPct || {}), ...(incoming.fieldWidthsPct || {}) },
   } as AppSettings;
   await saveSettings(merged);
   res.json(merged);
