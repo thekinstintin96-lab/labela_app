@@ -4,10 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadSettings, saveSettings, defaultSettings } from './settings/store.js';
 import { parseCsv } from './csv/parse.js';
-import { AppSettings, GenerateRequest, GenerateResponse } from './types/index.js';
+import { AppSettings, GenerateRequest, GenerateResponse, CsvProductRow } from './types/index.js';
 import { generatePdf } from './pdf/generator.js';
 import { promises as fsp } from 'fs';
 import { nanoid } from 'nanoid';
+import { postprocessRows } from './csv/postprocess.js';
+import { parsePrice } from './csv/parse.js';
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
@@ -138,8 +140,13 @@ app.post('/api/generate', async (req, res) => {
   try {
     const body = req.body as GenerateRequest;
     const settings = body.settings || (await loadSettings());
-    const rows = body.rows || [];
-    const result = await generatePdf(settings, rows);
+    const inbound = (body.rows || []) as CsvProductRow[];
+    // Run server-side postprocessing to fill missing Title/Vendor
+    const processed = postprocessRows(inbound).filter((r) => {
+      const p = parsePrice(r['Variant Price']);
+      return p !== undefined && p > 0;
+    });
+    const result = await generatePdf(settings, processed);
     const pdfUrl = result.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
     const overflowCsvUrl = result.overflowPath ? result.overflowPath.replace(path.resolve(process.cwd(), 'public'), '/public') : null;
     const incompleteCsvUrl = (result as any).incompletePath ? (result as any).incompletePath.replace(path.resolve(process.cwd(), 'public'), '/public') : null;
