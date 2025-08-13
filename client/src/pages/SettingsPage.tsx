@@ -59,6 +59,7 @@ export function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewAltUrl, setPreviewAltUrl] = useState<string | null>(null);
 
   useEffect(() => {
     axios.get('/api/settings').then((r) => setSettings(r.data));
@@ -95,7 +96,8 @@ export function SettingsPage() {
   const onPreview = async () => {
     if (!settings) return;
     const r = await axios.post('/api/preview', settings);
-    setPreviewUrl(r.data.previewUrl);
+    setPreviewUrl(r.data.previewOriginalUrl);
+    setPreviewAltUrl(r.data.previewAlternativeUrl);
   };
 
   return (
@@ -263,11 +265,18 @@ export function SettingsPage() {
       <Button onClick={onPreview}>
         Generate preview
       </Button>
-      {previewUrl && (
-        <Text as="p">
-          Preview: <Link url={previewUrl} target="_blank">Open</Link>
-        </Text>
-      )}
+      <BlockStack gap="200">
+        {previewUrl && (
+          <Text as="p">
+            Original preview: <Link url={previewUrl} target="_blank">Open</Link>
+          </Text>
+        )}
+        {previewAltUrl && (
+          <Text as="p">
+            Alternative preview: <Link url={previewAltUrl} target="_blank">Open</Link>
+          </Text>
+        )}
+      </BlockStack>
     </BlockStack>
   );
 }

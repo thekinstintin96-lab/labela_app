@@ -231,17 +231,6 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
-    // Optional short description (single line)
-    if (item.shortDescription) {
-      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
-      let desc = item.shortDescription;
-      if (doc.widthOfString(desc) > wTitle) {
-        while (desc.length > 0 && doc.widthOfString(desc + '…') > wTitle) desc = desc.slice(0, -1);
-        desc += '…';
-      }
-      doc.text(desc, innerX, cursorY, { width: wTitle, lineBreak: false });
-      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
-    }
 
     // Brand line with caption
     doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);

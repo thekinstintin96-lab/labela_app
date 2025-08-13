@@ -105,22 +105,29 @@ app.post('/api/preview', async (req, res) => {
       diagonalStrikeForCompare: incoming.diagonalStrikeForCompare ?? base.diagonalStrikeForCompare ?? true,
     } as AppSettings;
 
-    const sampleRow = {
+    const baseRow = {
       Handle: 'sample-product',
       Title: 'Sample Product Very Long Title To Test Wrapping',
       Vendor: 'BrandCo',
       'Variant SKU': 'SKU-TEST-500ML',
       'Variant Price': '3,49',
-      'Variant Compare At Price': '4,19',
       'Variant Grams': '500',
       'Option1 Value': '500 ml',
       'Image Src': '',
       short_description_product: 'Short description for preview (optional)'
-    };
+    } as any;
 
-    const result = await generatePdf(settings, [sampleRow as any]);
-    const pdfUrl = result.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
-    res.json({ previewUrl: pdfUrl });
+    // Original style (no discount)
+    const rowOriginal = { ...baseRow, 'Variant Compare At Price': '3,49' };
+    const r1 = await generatePdf(settings, [rowOriginal]);
+    const url1 = r1.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
+
+    // Alternative style (discount)
+    const rowAlt = { ...baseRow, 'Variant Compare At Price': '4,19' };
+    const r2 = await generatePdf(settings, [rowAlt]);
+    const url2 = r2.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
+
+    res.json({ previewOriginalUrl: url1, previewAlternativeUrl: url2 });
   } catch (err: any) {
     res.status(500).json({ error: 'Preview failed', details: String(err?.message || err) });
   }
