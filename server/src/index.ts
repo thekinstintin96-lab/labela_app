@@ -6,6 +6,8 @@ import { loadSettings, saveSettings, defaultSettings } from './settings/store.js
 import { parseCsv } from './csv/parse.js';
 import { AppSettings, GenerateRequest, GenerateResponse } from './types/index.js';
 import { generatePdf } from './pdf/generator.js';
+import { promises as fsp } from 'fs';
+import { nanoid } from 'nanoid';
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
@@ -16,6 +18,27 @@ app.use(express.json({ limit: '10mb' }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/public', express.static(path.join(__dirname, '../public')));
+
+app.post('/api/upload-logo', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const mime = req.file.mimetype || '';
+    if (!/^image\/(png|jpe?g|webp)$/i.test(mime)) {
+      return res.status(400).json({ error: 'Unsupported image type. Use PNG, JPG, or WebP.' });
+    }
+    const ext = mime.includes('png') ? '.png' : mime.includes('webp') ? '.webp' : '.jpg';
+    const uploadsDir = path.resolve(__dirname, '../public/uploads');
+    await fsp.mkdir(uploadsDir, { recursive: true });
+    const filename = `logo_${nanoid(8)}${ext}`;
+    const absPath = path.join(uploadsDir, filename);
+    await fsp.writeFile(absPath, req.file.buffer);
+    const publicUrl = `/public/uploads/${filename}`;
+    const publicPath = `public/uploads/${filename}`;
+    res.json({ url: publicUrl, path: publicPath });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Upload failed', details: String(err?.message || err) });
+  }
+});
 
 app.get('/api/settings', async (_req, res) => {
   const settings = await loadSettings();
