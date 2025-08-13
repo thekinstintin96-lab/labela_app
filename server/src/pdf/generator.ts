@@ -120,8 +120,9 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
   const incompleteRows: string[] = ['Handle,Title,Vendor,Reason'];
   for (const r of rows) {
     const price = parsePrice(r['Variant Price']);
-    if (price === undefined) {
-      incompleteRows.push(`${JSON.stringify(r.Handle || '')},${JSON.stringify(r.Title || '')},${JSON.stringify(r.Vendor || '')},"Missing price"`);
+    if (price === undefined || price <= 0) {
+      const reason = price === undefined ? 'Missing price' : 'Zero price';
+      incompleteRows.push(`${JSON.stringify(r.Handle || '')},${JSON.stringify(r.Title || '')},${JSON.stringify(r.Vendor || '')},"${reason}"`);
       continue;
     }
     const compare = parsePrice(r['Variant Compare At Price'] || undefined);
