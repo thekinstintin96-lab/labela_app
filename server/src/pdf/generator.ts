@@ -197,7 +197,6 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     const wVat = (leftColW * (widths.vat ?? 100)) / 100;
 
     // Optional brand logo underlay
-    const hasDiscount = !!(item.compareAtPrice && item.compareAtPrice > item.price);
     const logoCfg = hasDiscount ? settings.brandLogo?.alternative : settings.brandLogo?.original;
     if (logoCfg?.path && logoCfg.widthMm > 0) {
       try {
