@@ -6,65 +6,73 @@ const DATA_DIR = path.resolve(process.cwd(), 'data');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 
 const defaultCaptions: LabelCaptions = {
-  brand: 'Brand',
-  price: 'Price',
-  oldPrice: 'Old price',
-  unitPrice: 'Unit price',
-  vat: 'VAT',
+	brand: 'Brand',
+	price: 'Price',
+	oldPrice: 'Old price',
+	unitPrice: 'Unit price',
+	vat: 'VAT',
 };
 
 export const defaultSettings: AppSettings = {
-  storeDomain: 'example.myshopify.com',
-  vatRate: 0.20,
-  labelWidthMm: 60,
-  labelHeightMm: 40,
-  pageMarginMm: { top: 10, right: 10, bottom: 10, left: 10 },
-  gutterMm: { x: 3, y: 3 },
-  qrSizeMm: 20,
-  lineGapPt: 0,
-  qrOffsetMm: { x: 0, y: 0 },
-  captions: defaultCaptions,
-  styles: {
-    default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },
-    alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff' },
-    condition: 'discount',
-  },
-  fonts: {
-    titlePt: 10,
-    brandPt: 8,
-    pricePt: 14,
-    oldPricePt: 9,
-    unitPricePt: 8,
-    vatPt: 8,
-    shortDescPt: 8,
-  },
-  fieldWidthsPct: { title: 100, brand: 100, price: 100, oldPrice: 100, unitPrice: 100, vat: 100 },
-  brandLogo: {
-    original: { path: '', widthMm: 0, xMm: 0, yMm: 0, opacity: 0.2 },
-    alternative: { path: '', widthMm: 0, xMm: 0, yMm: 0, opacity: 0.2 },
-  },
-  diagonalStrikeForCompare: true,
-  shortDescMaxLines: 1,
-  qrBorderWidthPt: 0,
+	storeDomain: 'example.myshopify.com',
+	vatRate: 0.20,
+	labelWidthMm: 60,
+	labelHeightMm: 40,
+	pageMarginMm: { top: 5, right: 5, bottom: 10, left: 5 },
+	gutterMm: { x: 1, y: 1 },
+	qrSizeMm: 18,
+	lineGapPt: 3,
+	qrOffsetMm: { x: 0, y: 5 },
+	captions: defaultCaptions,
+	styles: {
+		default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },
+		alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff' },
+		condition: 'discount',
+	},
+	fonts: {
+		titlePt: 11,
+		brandPt: 8,
+		pricePt: 11,
+		oldPricePt: 9,
+		unitPricePt: 7,
+		vatPt: 7,
+		shortDescPt: 8,
+	},
+	fieldWidthsPct: {
+		title: 135,
+		brand: 100,
+		price: 100,
+		oldPrice: 100,
+		unitPrice: 100,
+		vat: 100,
+		shortDescription: 115,
+	},
+	brandLogo: {
+		original: { path: 'public/uploads/logo_EowK1JZm.png', widthMm: 13, xMm: 44, yMm: 3, opacity: 1 },
+		alternative: { path: 'public/uploads/logo_QOVxFAze.png', widthMm: 8, xMm: 48, yMm: 3, opacity: 1 },
+	},
+	diagonalStrikeForCompare: true,
+	shortDescMaxLines: 3,
+	qrBorderWidthPt: 0,
 };
 
 export async function ensureDataDir(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+	await fs.mkdir(DATA_DIR, { recursive: true });
 }
 
 export async function loadSettings(): Promise<AppSettings> {
-  await ensureDataDir();
-  try {
-    const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
-    const parsed = JSON.parse(raw) as AppSettings;
-    return parsed;
-  } catch (err) {
-    await saveSettings(defaultSettings);
-    return defaultSettings;
-  }
+	await ensureDataDir();
+	try {
+		const raw = await fs.readFile(SETTINGS_FILE, 'utf-8');
+		const parsed = JSON.parse(raw) as AppSettings;
+		return parsed;
+	} catch (err) {
+		await saveSettings(defaultSettings);
+		return defaultSettings;
+	}
 }
 
 export async function saveSettings(settings: AppSettings): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
+	await ensureDataDir();
+	await fs.writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
 }
