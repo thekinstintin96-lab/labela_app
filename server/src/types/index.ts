@@ -29,6 +29,9 @@ export type AppSettings = {
   pageMarginMm: { top: number; right: number; bottom: number; left: number };
   gutterMm: { x: number; y: number };
   qrSizeMm: number;
+  // Additional layout controls
+  lineGapPt?: number; // extra gap between lines in points
+  qrOffsetMm?: { x: number; y: number }; // manual QR position adjuster
   captions: LabelCaptions;
   styles?: {
     default: LabelStyle;
@@ -72,4 +75,5 @@ export type GenerateRequest = {
 export type GenerateResponse = {
   pdfUrl: string;
   overflowCsvUrl: string | null;
+  incompleteCsvUrl?: string | null;
 };

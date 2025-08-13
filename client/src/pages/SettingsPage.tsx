@@ -24,6 +24,8 @@ export type Settings = {
     unitPricePt: number;
     vatPt: number;
   };
+  lineGapPt?: number;
+  qrOffsetMm?: { x: number; y: number };
 };
 
 export function SettingsPage() {
@@ -82,6 +84,10 @@ export function SettingsPage() {
             <TextField label="Margin left" type="number" value={String(settings.pageMarginMm.left)} onChange={(v) => set('pageMarginMm.left', Number(v))} />
             <TextField label="Gutter X" type="number" value={String(settings.gutterMm.x)} onChange={(v) => set('gutterMm.x', Number(v))} />
             <TextField label="Gutter Y" type="number" value={String(settings.gutterMm.y)} onChange={(v) => set('gutterMm.y', Number(v))} />
+            <TextField label="Line gap (pt)" type="number" value={String(settings.lineGapPt ?? 0)} onChange={(v) => set('lineGapPt', Number(v))} />
+            <div />
+            <TextField label="QR offset X (mm)" type="number" value={String(settings.qrOffsetMm?.x ?? 0)} onChange={(v) => set('qrOffsetMm.x', Number(v))} />
+            <TextField label="QR offset Y (mm)" type="number" value={String(settings.qrOffsetMm?.y ?? 0)} onChange={(v) => set('qrOffsetMm.y', Number(v))} />
             <TextField label="QR size" type="number" value={String(settings.qrSizeMm)} onChange={(v) => set('qrSizeMm', Number(v))} />
           </InlineGrid>
         </BlockStack>

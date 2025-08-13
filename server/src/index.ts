@@ -60,7 +60,8 @@ app.post('/api/generate', async (req, res) => {
     const result = await generatePdf(settings, rows);
     const pdfUrl = result.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
     const overflowCsvUrl = result.overflowPath ? result.overflowPath.replace(path.resolve(process.cwd(), 'public'), '/public') : null;
-    const response: GenerateResponse = { pdfUrl, overflowCsvUrl };
+    const incompleteCsvUrl = (result as any).incompletePath ? (result as any).incompletePath.replace(path.resolve(process.cwd(), 'public'), '/public') : null;
+    const response: GenerateResponse = { pdfUrl, overflowCsvUrl, incompleteCsvUrl };
     res.json(response);
   } catch (err: any) {
     res.status(500).json({ error: 'Generation failed', details: String(err?.message || err) });

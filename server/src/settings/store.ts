@@ -21,6 +21,8 @@ export const defaultSettings: AppSettings = {
   pageMarginMm: { top: 10, right: 10, bottom: 10, left: 10 },
   gutterMm: { x: 3, y: 3 },
   qrSizeMm: 20,
+  lineGapPt: 0,
+  qrOffsetMm: { x: 0, y: 0 },
   captions: defaultCaptions,
   styles: {
     default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },

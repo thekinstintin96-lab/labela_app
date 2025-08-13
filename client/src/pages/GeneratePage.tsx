@@ -6,7 +6,7 @@ export function GeneratePage() {
   const [csvInfo, setCsvInfo] = useState<{ count: number; sample: any[] } | null>(null);
   const [rows, setRows] = useState<any[]>([]);
   const [generating, setGenerating] = useState(false);
-  const [result, setResult] = useState<{ pdfUrl: string; overflowCsvUrl?: string | null } | null>(null);
+  const [result, setResult] = useState<{ pdfUrl: string; overflowCsvUrl?: string | null; incompleteCsvUrl?: string | null } | null>(null);
 
   const onFileUpload = async (files: File[]) => {
     const file = files[0];
@@ -74,6 +74,11 @@ export function GeneratePage() {
               {result.overflowCsvUrl && (
                 <Text as="p">
                   Overflow report: <Link url={result.overflowCsvUrl} target="_blank">Open</Link>
+                </Text>
+              )}
+              {result.incompleteCsvUrl && (
+                <Text as="p">
+                  Incomplete data report: <Link url={result.incompleteCsvUrl} target="_blank">Open</Link>
                 </Text>
               )}
             </BlockStack>

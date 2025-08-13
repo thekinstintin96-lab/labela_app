@@ -102,6 +102,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
   const id = nanoid(8);
   const pdfPath = path.join(OUT_DIR, `labels_${id}.pdf`);
   const overflowPath = path.join(OUT_DIR, `overflow_${id}.csv`);
+  const incompletePath = path.join(OUT_DIR, `incomplete_${id}.csv`);
 
   const doc = new PDFDocument({ size: [A4.widthPt, A4.heightPt], margins: {
     top: mm(settings.pageMarginMm.top), bottom: mm(settings.pageMarginMm.bottom), left: mm(settings.pageMarginMm.left), right: mm(settings.pageMarginMm.right)
@@ -115,14 +116,26 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
   const fonts = settings.fonts || { titlePt: 10, brandPt: 8, pricePt: 14, oldPricePt: 9, unitPricePt: 8, vatPt: 8 };
 
   const items: ParsedItem[] = [];
+  const incompleteRows: string[] = ['Handle,Title,Vendor,Reason'];
   for (const r of rows) {
     const price = parsePrice(r['Variant Price']);
-    if (price === undefined) continue;
+    if (price === undefined) {
+      incompleteRows.push(`${JSON.stringify(r.Handle || '')},${JSON.stringify(r.Title || '')},${JSON.stringify(r.Vendor || '')},"Missing price"`);
+      continue;
+    }
     const compare = parsePrice(r['Variant Compare At Price'] || undefined);
     const url = buildUrl(settings.storeDomain, r.Handle);
     const size = sizeFromSkuOrOption(r['Option1 Value'], r['Variant SKU'], r['Variant Grams']);
     const unit = computeUnitPrice(price, size);
     const vat = computeVatFromGross(price, settings.vatRate);
+    // flag other missing fields
+    const missing: string[] = [];
+    if (!r.Title) missing.push('Missing title');
+    if (!r.Vendor) missing.push('Missing vendor');
+    if (!r.Handle) missing.push('Missing handle');
+    if (missing.length) {
+      incompleteRows.push(`${JSON.stringify(r.Handle || '')},${JSON.stringify(r.Title || '')},${JSON.stringify(r.Vendor || '')},"${missing.join('; ')}"`);
+    }
     items.push({
       handle: r.Handle,
       title: r.Title,
@@ -181,7 +194,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     const titleWrapped = wrapText(doc, item.title, leftColW, 2);
     for (const line of titleWrapped.lines) {
       doc.text(line, innerX, cursorY, { width: leftColW, lineBreak: false });
-      cursorY += doc.currentLineHeight();
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
     // Brand line with caption
@@ -191,8 +204,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
 
     // QR image aligned top with brand line
     const qrBuffer = await renderQrPngData(item.url, env.qrPx);
-    const qrY = cursorY; // top aligned with brand line
-    const qrX = innerX + leftColW + env.qrGap;
+    const qrY = cursorY + mm(settings.qrOffsetMm?.y || 0); // top aligned with brand line plus offset
+    const qrX = innerX + leftColW + env.qrGap + mm(settings.qrOffsetMm?.x || 0);
 
     // Draw brand line
     doc.text(brandEllipsis.lines[0], innerX, cursorY, { width: leftColW, lineBreak: false });
@@ -200,7 +213,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     // Draw QR
     doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
 
-    cursorY += doc.currentLineHeight();
+    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Price bold
     doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.pricePt);
@@ -213,7 +226,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       priceText += '…';
     }
     doc.text(priceText, innerX, cursorY, { width: leftColW, lineBreak: false });
-    cursorY += doc.currentLineHeight();
+    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Old price (strikethrough numeric part)
     if (item.compareAtPrice && item.compareAtPrice > item.price) {
@@ -230,7 +243,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       doc.save();
       doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
       doc.restore();
-      cursorY += doc.currentLineHeight();
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
     // Unit price
@@ -244,7 +257,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
         upText += '…';
       }
       doc.text(upText, innerX, cursorY, { width: leftColW, lineBreak: false });
-      cursorY += doc.currentLineHeight();
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
     // VAT
@@ -257,7 +270,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       vatText += '…';
     }
     doc.text(vatText, innerX, cursorY, { width: leftColW, lineBreak: false });
-    cursorY += doc.currentLineHeight();
+    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Overflow detection
     let overflowReason: string | undefined;
@@ -280,10 +293,14 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
   });
 
   let overflowPathOut: string | null = null;
+  let incompletePathOut: string | null = null;
   if (overflowRows.length > 1) {
     await fsp.writeFile(overflowPath, overflowRows.join('\n'), 'utf-8');
     overflowPathOut = overflowPath;
   }
-
-  return { pdfPath, overflowPath: overflowPathOut };
+  if (incompleteRows.length > 1) {
+    await fsp.writeFile(incompletePath, incompleteRows.join('\n'), 'utf-8');
+    incompletePathOut = incompletePath;
+  }
+  return { pdfPath, overflowPath: overflowPathOut, incompletePath: incompletePathOut as any } as any;
 }
