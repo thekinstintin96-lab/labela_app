@@ -43,6 +43,7 @@ export const defaultSettings: AppSettings = {
     alternative: { path: '', widthMm: 0, xMm: 0, yMm: 0, opacity: 0.2 },
   },
   diagonalStrikeForCompare: true,
+  shortDescMaxLines: 1,
 };
 
 export async function ensureDataDir(): Promise<void> {

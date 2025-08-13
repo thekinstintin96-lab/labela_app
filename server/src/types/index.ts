@@ -43,8 +43,9 @@ export type AppSettings = {
     condition: 'discount';
   };
   fonts?: LabelFonts;
-  fieldWidthsPct?: { title: number; brand: number; price: number; oldPrice: number; unitPrice: number; vat: number };
+  fieldWidthsPct?: { title: number; brand: number; price: number; oldPrice: number; unitPrice: number; vat: number; shortDescription?: number };
   diagonalStrikeForCompare?: boolean;
+  shortDescMaxLines?: number;
 };
 
 export type CsvProductRow = {

@@ -323,6 +323,18 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     doc.text(vatText, innerX, cursorY, { width: wVat, lineBreak: false });
     cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
+    // Short description at the bottom
+    if (item.shortDescription) {
+      const wShort = (leftColW * ((settings.fieldWidthsPct?.shortDescription ?? 100) / 100));
+      const maxLines = Math.max(1, settings.shortDescMaxLines ?? 1);
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
+      const wrapped = wrapText(doc, item.shortDescription, wShort, maxLines);
+      for (const line of wrapped.lines) {
+        doc.text(line, innerX, cursorY, { width: wShort, lineBreak: false });
+        cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
+      }
+    }
+
     // Overflow detection
     let overflowReason: string | undefined;
     const exceededHeight = cursorY > innerY + innerH;

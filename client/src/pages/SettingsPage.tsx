@@ -33,6 +33,7 @@ export type Settings = {
     oldPrice: number;
     unitPrice: number;
     vat: number;
+    shortDescription: number;
   };
   brandLogo?: {
     original?: {
@@ -51,6 +52,7 @@ export type Settings = {
     };
   };
   diagonalStrikeForCompare?: boolean;
+  shortDescMaxLines?: number;
 };
 
 export function SettingsPage() {
@@ -171,6 +173,7 @@ export function SettingsPage() {
             <TextField label="Old price width %" type="number" value={String(settings.fieldWidthsPct?.oldPrice ?? 100)} onChange={(v) => set('fieldWidthsPct.oldPrice', Number(v))} />
             <TextField label="Unit price width %" type="number" value={String(settings.fieldWidthsPct?.unitPrice ?? 100)} onChange={(v) => set('fieldWidthsPct.unitPrice', Number(v))} />
             <TextField label="VAT width %" type="number" value={String(settings.fieldWidthsPct?.vat ?? 100)} onChange={(v) => set('fieldWidthsPct.vat', Number(v))} />
+            <TextField label="Short description width %" type="number" value={String(settings.fieldWidthsPct?.shortDescription ?? 100)} onChange={(v) => set('fieldWidthsPct.shortDescription', Number(v))} />
           </InlineGrid>
         </BlockStack>
       </Card>
@@ -240,6 +243,16 @@ export function SettingsPage() {
           <Text as="h3" variant="headingMd">Compare price strike style</Text>
           <InlineGrid columns={2} gap="400">
             <TextField label="Diagonal strike for compare price (1=true, 0=false)" type="number" value={String(settings.diagonalStrikeForCompare ? 1 : 0)} onChange={(v) => set('diagonalStrikeForCompare', Number(v) === 1)} helpText="Set to 1 to draw a diagonal line through the compare-at price" />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Short description</Text>
+          <InlineGrid columns={2} gap="400">
+            <TextField label="Max lines" type="number" value={String(settings.shortDescMaxLines ?? 1)} onChange={(v) => set('shortDescMaxLines', Number(v))} />
+            <TextField label="Width %" type="number" value={String(settings.fieldWidthsPct?.shortDescription ?? 100)} onChange={(v) => set('fieldWidthsPct.shortDescription', Number(v))} />
           </InlineGrid>
         </BlockStack>
       </Card>
