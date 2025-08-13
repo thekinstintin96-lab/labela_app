@@ -81,6 +81,51 @@ app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
   }
 });
 
+app.post('/api/preview', async (req, res) => {
+  try {
+    const incoming = req.body as Partial<AppSettings>;
+    const base = await loadSettings();
+    const settings: AppSettings = {
+      ...base,
+      ...incoming,
+      pageMarginMm: { ...base.pageMarginMm, ...(incoming.pageMarginMm || {}) },
+      gutterMm: { ...base.gutterMm, ...(incoming.gutterMm || {}) },
+      captions: { ...base.captions, ...(incoming.captions || {}) },
+      styles: {
+        default: { ...(base.styles?.default || {}), ...(incoming.styles?.default || {}) },
+        alternative: { ...(base.styles?.alternative || {}), ...(incoming.styles?.alternative || {}) },
+        condition: incoming.styles?.condition || base.styles?.condition || 'discount',
+      },
+      fonts: { ...(base.fonts || {}), ...(incoming.fonts || {}) },
+      fieldWidthsPct: { ...(base.fieldWidthsPct || {}), ...(incoming.fieldWidthsPct || {}) },
+      brandLogo: {
+        original: { ...(base.brandLogo?.original || {}), ...(incoming.brandLogo?.original || {}) },
+        alternative: { ...(base.brandLogo?.alternative || {}), ...(incoming.brandLogo?.alternative || {}) },
+      },
+      diagonalStrikeForCompare: incoming.diagonalStrikeForCompare ?? base.diagonalStrikeForCompare ?? true,
+    } as AppSettings;
+
+    const sampleRow = {
+      Handle: 'sample-product',
+      Title: 'Sample Product Very Long Title To Test Wrapping',
+      Vendor: 'BrandCo',
+      'Variant SKU': 'SKU-TEST-500ML',
+      'Variant Price': '3,49',
+      'Variant Compare At Price': '4,19',
+      'Variant Grams': '500',
+      'Option1 Value': '500 ml',
+      'Image Src': '',
+      short_description_product: 'Short description for preview (optional)'
+    };
+
+    const result = await generatePdf(settings, [sampleRow as any]);
+    const pdfUrl = result.pdfPath.replace(path.resolve(process.cwd(), 'public'), '/public');
+    res.json({ previewUrl: pdfUrl });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Preview failed', details: String(err?.message || err) });
+  }
+});
+
 app.post('/api/generate', async (req, res) => {
   try {
     const body = req.body as GenerateRequest;

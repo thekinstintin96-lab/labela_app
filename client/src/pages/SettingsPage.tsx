@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, InlineGrid, Text, TextField, Button, BlockStack, DropZone } from '@shopify/polaris';
+import { Card, InlineGrid, Text, TextField, Button, BlockStack, DropZone, Link } from '@shopify/polaris';
 import axios from 'axios';
 
 export type Settings = {
@@ -56,6 +56,7 @@ export type Settings = {
 export function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     axios.get('/api/settings').then((r) => setSettings(r.data));
@@ -87,6 +88,12 @@ export function SettingsPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const onPreview = async () => {
+    if (!settings) return;
+    const r = await axios.post('/api/preview', settings);
+    setPreviewUrl(r.data.previewUrl);
   };
 
   return (
@@ -240,6 +247,14 @@ export function SettingsPage() {
       <Button primary onClick={onSave} loading={saving}>
         Save settings
       </Button>
+      <Button onClick={onPreview}>
+        Generate preview
+      </Button>
+      {previewUrl && (
+        <Text as="p">
+          Preview: <Link url={previewUrl} target="_blank">Open</Link>
+        </Text>
+      )}
     </BlockStack>
   );
 }
