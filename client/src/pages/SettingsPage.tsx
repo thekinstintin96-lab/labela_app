@@ -69,7 +69,11 @@ export function SettingsPage() {
       const copy: any = JSON.parse(JSON.stringify(s));
       const parts = path.split('.');
       let obj = copy;
-      for (let i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+      for (let i = 0; i < parts.length - 1; i++) {
+        const key = parts[i];
+        if (obj[key] === undefined || obj[key] === null) obj[key] = {};
+        obj = obj[key];
+      }
       obj[parts[parts.length - 1]] = value;
       return copy;
     });

@@ -38,6 +38,11 @@ export const defaultSettings: AppSettings = {
     vatPt: 8,
   },
   fieldWidthsPct: { title: 100, brand: 100, price: 100, oldPrice: 100, unitPrice: 100, vat: 100 },
+  brandLogo: {
+    original: { path: '', widthMm: 0, xMm: 0, yMm: 0, opacity: 0.2 },
+    alternative: { path: '', widthMm: 0, xMm: 0, yMm: 0, opacity: 0.2 },
+  },
+  diagonalStrikeForCompare: true,
 };
 
 export async function ensureDataDir(): Promise<void> {
