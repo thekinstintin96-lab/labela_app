@@ -112,6 +112,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
   // Fonts: use built-in Helvetica
   const titleFont = 'Helvetica-Bold';
   const textFont = 'Helvetica';
+  const fonts = settings.fonts || { titlePt: 10, brandPt: 8, pricePt: 14, oldPricePt: 9, unitPricePt: 8, vatPt: 8 };
 
   const items: ParsedItem[] = [];
   for (const r of rows) {
@@ -176,7 +177,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     let cursorY = innerY;
 
     // Title: up to 2 lines, bold
-    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(10);
+    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.titlePt);
     const titleWrapped = wrapText(doc, item.title, leftColW, 2);
     for (const line of titleWrapped.lines) {
       doc.text(line, innerX, cursorY, { width: leftColW, lineBreak: false });
@@ -184,7 +185,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     }
 
     // Brand line with caption
-    doc.fillColor(textColor).font('Helvetica').fontSize(8);
+    doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
     const brandText = `${settings.captions.brand}: ${item.brand}`;
     const brandEllipsis = wrapText(doc, brandText, leftColW, 1);
 
@@ -202,7 +203,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     cursorY += doc.currentLineHeight();
 
     // Price bold
-    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(14);
+    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.pricePt);
     let priceText = `${settings.captions.price}: ${formatCurrencyAT(item.price)}`;
     if (doc.widthOfString(priceText) > leftColW) {
       // ellipsize if needed
@@ -216,7 +217,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
 
     // Old price (strikethrough numeric part)
     if (item.compareAtPrice && item.compareAtPrice > item.price) {
-      doc.fillColor(textColor).font('Helvetica').fontSize(9);
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.oldPricePt);
       const oldPriceLabel = `${settings.captions.oldPrice}: `;
       const oldPriceValue = formatCurrencyAT(item.compareAtPrice);
       const startX = innerX;
@@ -234,7 +235,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
 
     // Unit price
     if (item.unitPriceText) {
-      doc.fillColor(textColor).font('Helvetica').fontSize(8);
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.unitPricePt);
       let upText = `${settings.captions.unitPrice}: ${item.unitPriceText}`;
       if (doc.widthOfString(upText) > leftColW) {
         while (upText.length > 0 && doc.widthOfString(upText + '…') > leftColW) {
@@ -247,7 +248,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     }
 
     // VAT
-    doc.fillColor(textColor).font('Helvetica').fontSize(8);
+    doc.fillColor(textColor).font('Helvetica').fontSize(fonts.vatPt);
     let vatText = `${settings.captions.vat}: ${item.vatAmountText}`;
     if (doc.widthOfString(vatText) > leftColW) {
       while (vatText.length > 0 && doc.widthOfString(vatText + '…') > leftColW) {

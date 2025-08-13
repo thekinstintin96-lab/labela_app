@@ -12,6 +12,15 @@ export type LabelStyle = {
   strokeColor?: string; // optional line color
 };
 
+export type LabelFonts = {
+  titlePt: number;
+  brandPt: number;
+  pricePt: number;
+  oldPricePt: number;
+  unitPricePt: number;
+  vatPt: number;
+};
+
 export type AppSettings = {
   storeDomain: string; // e.g., mystore.myshopify.com
   vatRate: number; // 0.20
@@ -24,9 +33,9 @@ export type AppSettings = {
   styles?: {
     default: LabelStyle;
     alternative: LabelStyle;
-    // when to apply alternative style: if item has a discount (compare_at > price)
     condition: 'discount';
   };
+  fonts?: LabelFonts;
 };
 
 export type CsvProductRow = {

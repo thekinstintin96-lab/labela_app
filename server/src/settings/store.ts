@@ -27,6 +27,14 @@ export const defaultSettings: AppSettings = {
     alternative: { backgroundColor: '#FFF3CD', textColor: '#000000', strokeColor: '#000000' },
     condition: 'discount',
   },
+  fonts: {
+    titlePt: 10,
+    brandPt: 8,
+    pricePt: 14,
+    oldPricePt: 9,
+    unitPricePt: 8,
+    vatPt: 8,
+  },
 };
 
 export async function ensureDataDir(): Promise<void> {

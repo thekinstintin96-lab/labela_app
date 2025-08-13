@@ -36,6 +36,7 @@ app.post('/api/settings', async (req, res) => {
       alternative: { ...(current.styles?.alternative || {}), ...(incoming.styles?.alternative || {}) },
       condition: incoming.styles?.condition || current.styles?.condition || 'discount',
     },
+    fonts: { ...(current.fonts || {}), ...(incoming.fonts || {}) },
   } as AppSettings;
   await saveSettings(merged);
   res.json(merged);

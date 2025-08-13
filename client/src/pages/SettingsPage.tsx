@@ -16,6 +16,14 @@ export type Settings = {
     alternative: { backgroundColor: string; textColor: string; strokeColor?: string };
     condition: 'discount';
   };
+  fonts?: {
+    titlePt: number;
+    brandPt: number;
+    pricePt: number;
+    oldPricePt: number;
+    unitPricePt: number;
+    vatPt: number;
+  };
 };
 
 export function SettingsPage() {
@@ -107,6 +115,22 @@ export function SettingsPage() {
             <TextField label="Background color" value={settings.styles?.alternative.backgroundColor || ''} onChange={(v) => set('styles.alternative.backgroundColor', v)} placeholder="#FFF3CD" />
             <TextField label="Text color" value={settings.styles?.alternative.textColor || ''} onChange={(v) => set('styles.alternative.textColor', v)} placeholder="#000000" />
             <TextField label="Stroke color" value={settings.styles?.alternative.strokeColor || ''} onChange={(v) => set('styles.alternative.strokeColor', v)} placeholder="#000000" />
+          </InlineGrid>
+        </BlockStack>
+      </Card>
+
+      <Card>
+        <BlockStack gap="300">
+          <Text as="h3" variant="headingMd">Typography & QR</Text>
+          <InlineGrid columns={2} gap="400">
+            <TextField label="QR size (mm)" type="number" value={String(settings.qrSizeMm)} onChange={(v) => set('qrSizeMm', Number(v))} />
+            <div />
+            <TextField label="Title font (pt)" type="number" value={String(settings.fonts?.titlePt ?? 10)} onChange={(v) => set('fonts.titlePt', Number(v))} />
+            <TextField label="Brand font (pt)" type="number" value={String(settings.fonts?.brandPt ?? 8)} onChange={(v) => set('fonts.brandPt', Number(v))} />
+            <TextField label="Price font (pt)" type="number" value={String(settings.fonts?.pricePt ?? 14)} onChange={(v) => set('fonts.pricePt', Number(v))} />
+            <TextField label="Old price font (pt)" type="number" value={String(settings.fonts?.oldPricePt ?? 9)} onChange={(v) => set('fonts.oldPricePt', Number(v))} />
+            <TextField label="Unit price font (pt)" type="number" value={String(settings.fonts?.unitPricePt ?? 8)} onChange={(v) => set('fonts.unitPricePt', Number(v))} />
+            <TextField label="VAT font (pt)" type="number" value={String(settings.fonts?.vatPt ?? 8)} onChange={(v) => set('fonts.vatPt', Number(v))} />
           </InlineGrid>
         </BlockStack>
       </Card>
