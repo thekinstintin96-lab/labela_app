@@ -230,6 +230,13 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       doc.text(line, innerX, cursorY, { width: wTitle, lineBreak: false });
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
+    {
+      const reservedLines = 2;
+      const titleLineHeight = doc.currentLineHeight();
+      if (titleWrapped.lines.length < reservedLines) {
+        cursorY += (reservedLines - titleWrapped.lines.length) * (titleLineHeight + (settings.lineGapPt || 0));
+      }
+    }
 
 
     // Brand line with caption
