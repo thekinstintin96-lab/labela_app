@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Card, InlineGrid, Text, TextField, Button, BlockStack, DropZone, Link } from '@shopify/polaris';
 import axios from 'axios';
 
@@ -60,6 +60,9 @@ export function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewAltUrl, setPreviewAltUrl] = useState<string | null>(null);
+  const [livePreview, setLivePreview] = useState<boolean>(true);
+  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
+  const debounceRef = useRef<number | null>(null);
 
   useEffect(() => {
     axios.get('/api/settings').then((r) => setSettings(r.data));
@@ -99,6 +102,25 @@ export function SettingsPage() {
     setPreviewUrl(r.data.previewOriginalUrl);
     setPreviewAltUrl(r.data.previewAlternativeUrl);
   };
+
+  // Live preview (debounced)
+  useEffect(() => {
+    if (!settings || !livePreview) return;
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(async () => {
+      try {
+        setPreviewLoading(true);
+        await onPreview();
+      } catch {
+        // ignore
+      } finally {
+        setPreviewLoading(false);
+      }
+    }, 800);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [settings, livePreview]);
 
   return (
     <BlockStack gap="400">
@@ -287,6 +309,37 @@ export function SettingsPage() {
           </Text>
         )}
       </BlockStack>
+
+      <Card>
+        <BlockStack gap="200">
+          <InlineGrid columns={2} gap="400">
+            <Text as="h3" variant="headingMd">Live Preview</Text>
+            <div style={{ textAlign: 'right' }}>
+              <Button onClick={() => setLivePreview((v) => !v)}>
+                {livePreview ? 'Live preview: ON' : 'Live preview: OFF'}
+              </Button>
+            </div>
+          </InlineGrid>
+          <InlineGrid columns={2} gap="400">
+            <div style={{ border: '1px solid #e5e5e5', height: 480 }}>
+              {previewLoading && <Text as="p">Loading original…</Text>}
+              {previewUrl ? (
+                <iframe src={previewUrl} style={{ width: '100%', height: '100%', border: 'none' }} title="Original preview" />
+              ) : (
+                <Text as="p">Original preview will appear here</Text>
+              )}
+            </div>
+            <div style={{ border: '1px solid #e5e5e5', height: 480 }}>
+              {previewLoading && <Text as="p">Loading alternative…</Text>}
+              {previewAltUrl ? (
+                <iframe src={previewAltUrl} style={{ width: '100%', height: '100%', border: 'none' }} title="Alternative preview" />
+              ) : (
+                <Text as="p">Alternative preview will appear here</Text>
+              )}
+            </div>
+          </InlineGrid>
+        </BlockStack>
+      </Card>
     </BlockStack>
   );
 }
