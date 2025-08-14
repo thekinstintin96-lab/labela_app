@@ -110,6 +110,11 @@ app.post('/api/preview', async (req, res) => {
         alternative: { ...(base.brandLogo?.alternative || {}), ...(incoming.brandLogo?.alternative || {}) },
       },
       diagonalStrikeForCompare: incoming.diagonalStrikeForCompare ?? base.diagonalStrikeForCompare ?? true,
+      compareStrikeEnabled: incoming.compareStrikeEnabled ?? base.compareStrikeEnabled ?? true,
+      fieldOffsetsMm: { ...(base.fieldOffsetsMm || {}), ...(incoming.fieldOffsetsMm || {}) },
+      fieldEnabled: { ...(base.fieldEnabled || {}), ...(incoming.fieldEnabled || {}) },
+      qrBorderEnabled: incoming.qrBorderEnabled ?? base.qrBorderEnabled ?? false,
+      qrBorderWidthPt: incoming.qrBorderWidthPt ?? base.qrBorderWidthPt ?? 0,
     } as AppSettings;
 
     const baseRow = {
@@ -136,7 +141,8 @@ app.post('/api/preview', async (req, res) => {
 
     res.json({ previewOriginalUrl: url1, previewAlternativeUrl: url2 });
   } catch (err: any) {
-    res.status(500).json({ error: 'Preview failed', details: String(err?.message || err) });
+    console.error('Preview failed:', err);
+    res.status(500).json({ error: 'Preview failed', details: String(err?.stack || err?.message || err) });
   }
 });
 
