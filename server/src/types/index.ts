@@ -12,6 +12,7 @@ export type LabelStyle = {
   strokeColor?: string; // optional line color
   borderWidthPt?: number;
   borderColor?: string;
+  borderEnabled?: boolean;
 };
 
 export type LabelFonts = {
@@ -33,6 +34,7 @@ export type AppSettings = {
   gutterMm: { x: number; y: number };
   qrSizeMm: number;
   qrBorderWidthPt?: number;
+  qrBorderEnabled?: boolean;
   // Additional layout controls
   lineGapPt?: number; // extra gap between lines in points
   qrOffsetMm?: { x: number; y: number }; // manual QR position adjuster
@@ -57,6 +59,7 @@ export type AppSettings = {
     vat?: { xMm: number; yMm: number };
     shortDescription?: { xMm: number; yMm: number };
   };
+  compareStrikeEnabled?: boolean;
   diagonalStrikeForCompare?: boolean;
   shortDescMaxLines?: number;
 };

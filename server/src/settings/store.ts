@@ -25,8 +25,8 @@ export const defaultSettings: AppSettings = {
 	qrOffsetMm: { x: 0, y: 5 },
 	captions: defaultCaptions,
 	styles: {
-		default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000', borderWidthPt: 0, borderColor: '#000000' },
-		alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff', borderWidthPt: 0, borderColor: '#ffffff' },
+		default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000', borderWidthPt: 0, borderColor: '#000000', borderEnabled: false },
+		alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff', borderWidthPt: 0, borderColor: '#ffffff', borderEnabled: false },
 		condition: 'discount',
 	},
 	fonts: {
@@ -63,6 +63,8 @@ export const defaultSettings: AppSettings = {
 	diagonalStrikeForCompare: true,
 	shortDescMaxLines: 3,
 	qrBorderWidthPt: 0,
+	qrBorderEnabled: false,
+	compareStrikeEnabled: true,
 };
 
 export async function ensureDataDir(): Promise<void> {

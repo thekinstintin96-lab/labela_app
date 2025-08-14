@@ -180,7 +180,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     doc.save();
     doc.rect(x0, y0, env.label.width, env.label.height).fill(bgColor);
     doc.restore();
-    if ((style?.borderWidthPt || 0) > 0) {
+    if (style?.borderEnabled && (style?.borderWidthPt || 0) > 0) {
       doc.save();
       doc.lineWidth(style?.borderWidthPt || 0).strokeColor(style?.borderColor || strokeColor);
       doc.rect(x0, y0, env.label.width, env.label.height).stroke();
@@ -263,7 +263,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
 
     // Draw QR
     doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
-    if ((settings.qrBorderWidthPt || 0) > 0) {
+    if (settings.qrBorderEnabled && (settings.qrBorderWidthPt || 0) > 0) {
       doc.save();
       doc.lineWidth(settings.qrBorderWidthPt || 0).strokeColor(strokeColor).rect(qrX, qrY, env.qrPx, env.qrPx).stroke();
       doc.restore();
@@ -299,10 +299,10 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       const valueX = startX + labelWidth;
       // draw strike-through over numeric part
       doc.save();
-      if (settings.diagonalStrikeForCompare) {
+      if (settings.compareStrikeEnabled && settings.diagonalStrikeForCompare) {
         const ascent = doc.currentLineHeight() * 0.8;
         doc.moveTo(valueX, y + ascent).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
-      } else {
+      } else if (settings.compareStrikeEnabled) {
         doc.moveTo(valueX, y).lineTo(valueX + valueWidth, y).strokeColor(strokeColor).stroke();
       }
       doc.restore();
