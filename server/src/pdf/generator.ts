@@ -231,35 +231,38 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     let cursorY = innerY;
 
     // Title: up to 2 lines, bold
-    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.titlePt);
-    const titleWrapped = wrapText(doc, item.title, wTitle, 2);
-    const offTitle = settings.fieldOffsetsMm?.title || { xMm: 0, yMm: 0 };
-    for (const line of titleWrapped.lines) {
-      doc.text(line, innerX + mm(offTitle.xMm), cursorY + mm(offTitle.yMm), { width: wTitle, lineBreak: false });
-      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
-    }
-    {
-      const reservedLines = 2;
-      const titleLineHeight = doc.currentLineHeight();
-      if (titleWrapped.lines.length < reservedLines) {
-        cursorY += (reservedLines - titleWrapped.lines.length) * (titleLineHeight + (settings.lineGapPt || 0));
+    if (settings.fieldEnabled?.title !== false) {
+      doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.titlePt);
+      const titleWrapped = wrapText(doc, item.title, wTitle, 2);
+      const offTitle = settings.fieldOffsetsMm?.title || { xMm: 0, yMm: 0 };
+      for (const line of titleWrapped.lines) {
+        doc.text(line, innerX + mm(offTitle.xMm), cursorY + mm(offTitle.yMm), { width: wTitle, lineBreak: false });
+        cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
+      }
+      {
+        const reservedLines = 2;
+        const titleLineHeight = doc.currentLineHeight();
+        if (titleWrapped.lines.length < reservedLines) {
+          cursorY += (reservedLines - titleWrapped.lines.length) * (titleLineHeight + (settings.lineGapPt || 0));
+        }
       }
     }
 
-
     // Brand line with caption
-    doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
-    const brandText = `${settings.captions.brand}: ${item.brand}`;
-    const brandEllipsis = wrapText(doc, brandText, wBrand, 1);
+    let brandLineHeight = 0;
+    if (settings.fieldEnabled?.brand !== false) {
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.brandPt);
+      const brandText = `${settings.captions.brand}: ${item.brand}`;
+      const brandEllipsis = wrapText(doc, brandText, wBrand, 1);
+      const offBrand = settings.fieldOffsetsMm?.brand || { xMm: 0, yMm: 0 };
+      doc.text(brandEllipsis.lines[0], innerX + mm(offBrand.xMm), cursorY + mm(offBrand.yMm), { width: wBrand, lineBreak: false });
+      brandLineHeight = doc.currentLineHeight();
+    }
 
     // QR image aligned top with brand line
     const qrBuffer = await renderQrPngData(item.url, env.qrPx);
     const qrY = cursorY + mm(settings.qrOffsetMm?.y || 0); // top aligned with brand line plus offset
     const qrX = innerX + leftColW + env.qrGap + mm(settings.qrOffsetMm?.x || 0);
-
-    // Draw brand line
-    const offBrand = settings.fieldOffsetsMm?.brand || { xMm: 0, yMm: 0 };
-    doc.text(brandEllipsis.lines[0], innerX + mm(offBrand.xMm), cursorY + mm(offBrand.yMm), { width: wBrand, lineBreak: false });
 
     // Draw QR
     doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
@@ -268,25 +271,26 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       doc.lineWidth(settings.qrBorderWidthPt || 0).strokeColor(strokeColor).rect(qrX, qrY, env.qrPx, env.qrPx).stroke();
       doc.restore();
     }
-
-    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
+    cursorY += (brandLineHeight || doc.currentLineHeight()) + (settings.lineGapPt || 0);
 
     // Price bold
-    doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.pricePt);
-    let priceText = `${settings.captions.price}: ${formatCurrencyAT(item.price)}`;
-    if (doc.widthOfString(priceText) > wPrice) {
-      // ellipsize if needed
-      while (priceText.length > 0 && doc.widthOfString(priceText + '…') > wPrice) {
-        priceText = priceText.slice(0, -1);
+    if (settings.fieldEnabled?.price !== false) {
+      doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.pricePt);
+      let priceText = `${settings.captions.price}: ${formatCurrencyAT(item.price)}`;
+      if (doc.widthOfString(priceText) > wPrice) {
+        // ellipsize if needed
+        while (priceText.length > 0 && doc.widthOfString(priceText + '…') > wPrice) {
+          priceText = priceText.slice(0, -1);
+        }
+        priceText += '…';
       }
-      priceText += '…';
+      const offPrice = settings.fieldOffsetsMm?.price || { xMm: 0, yMm: 0 };
+      doc.text(priceText, innerX + mm(offPrice.xMm), cursorY + mm(offPrice.yMm), { width: wPrice, lineBreak: false });
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
-    const offPrice = settings.fieldOffsetsMm?.price || { xMm: 0, yMm: 0 };
-    doc.text(priceText, innerX + mm(offPrice.xMm), cursorY + mm(offPrice.yMm), { width: wPrice, lineBreak: false });
-    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Old price (strikethrough numeric part)
-    if (item.compareAtPrice && item.compareAtPrice > item.price) {
+    if (item.compareAtPrice && item.compareAtPrice > item.price && settings.fieldEnabled?.oldPrice !== false) {
       doc.fillColor(textColor).font('Helvetica').fontSize(fonts.oldPricePt);
       const oldPriceLabel = `${settings.captions.oldPrice}: `;
       const oldPriceValue = formatCurrencyAT(item.compareAtPrice);
@@ -310,7 +314,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     }
 
     // Unit price
-    if (item.unitPriceText) {
+    if (item.unitPriceText && settings.fieldEnabled?.unitPrice !== false) {
       doc.fillColor(textColor).font('Helvetica').fontSize(fonts.unitPricePt);
       let upText = `${settings.captions.unitPrice}: ${item.unitPriceText}`;
       if (doc.widthOfString(upText) > wUnit) {
@@ -325,20 +329,22 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     }
 
     // VAT
-    doc.fillColor(textColor).font('Helvetica').fontSize(fonts.vatPt);
-    let vatText = `${settings.captions.vat}: ${item.vatAmountText}`;
-    if (doc.widthOfString(vatText) > wVat) {
-      while (vatText.length > 0 && doc.widthOfString(vatText + '…') > wVat) {
-        vatText = vatText.slice(0, -1);
+    if (settings.fieldEnabled?.vat !== false) {
+      doc.fillColor(textColor).font('Helvetica').fontSize(fonts.vatPt);
+      let vatText = `${settings.captions.vat}: ${item.vatAmountText}`;
+      if (doc.widthOfString(vatText) > wVat) {
+        while (vatText.length > 0 && doc.widthOfString(vatText + '…') > wVat) {
+          vatText = vatText.slice(0, -1);
+        }
+        vatText += '…';
       }
-      vatText += '…';
+      const offVat = settings.fieldOffsetsMm?.vat || { xMm: 0, yMm: 0 };
+      doc.text(vatText, innerX + mm(offVat.xMm), cursorY + mm(offVat.yMm), { width: wVat, lineBreak: false });
+      cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
-    const offVat = settings.fieldOffsetsMm?.vat || { xMm: 0, yMm: 0 };
-    doc.text(vatText, innerX + mm(offVat.xMm), cursorY + mm(offVat.yMm), { width: wVat, lineBreak: false });
-    cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Short description at the bottom
-    if (item.shortDescription) {
+    if (item.shortDescription && settings.fieldEnabled?.shortDescription !== false) {
       const wShort = (leftColW * ((settings.fieldWidthsPct?.shortDescription ?? 100) / 100));
       const maxLines = Math.max(1, settings.shortDescMaxLines ?? 1);
       doc.fillColor(textColor).font('Helvetica').fontSize(fonts.shortDescPt || fonts.brandPt);

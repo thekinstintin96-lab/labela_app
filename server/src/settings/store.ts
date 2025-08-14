@@ -56,6 +56,15 @@ export const defaultSettings: AppSettings = {
 		vat: { xMm: 0, yMm: 0 },
 		shortDescription: { xMm: 0, yMm: 0 },
 	},
+	fieldEnabled: {
+		title: true,
+		brand: true,
+		price: true,
+		oldPrice: true,
+		unitPrice: true,
+		vat: true,
+		shortDescription: true,
+	},
 	brandLogo: {
 		original: { path: 'public/uploads/logo_EowK1JZm.png', widthMm: 13, xMm: 44, yMm: 3, opacity: 1 },
 		alternative: { path: 'public/uploads/logo_QOVxFAze.png', widthMm: 8, xMm: 48, yMm: 3, opacity: 1 },

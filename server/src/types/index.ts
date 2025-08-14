@@ -59,6 +59,15 @@ export type AppSettings = {
     vat?: { xMm: number; yMm: number };
     shortDescription?: { xMm: number; yMm: number };
   };
+  fieldEnabled?: {
+    title?: boolean;
+    brand?: boolean;
+    price?: boolean;
+    oldPrice?: boolean;
+    unitPrice?: boolean;
+    vat?: boolean;
+    shortDescription?: boolean;
+  };
   compareStrikeEnabled?: boolean;
   diagonalStrikeForCompare?: boolean;
   shortDescMaxLines?: number;
