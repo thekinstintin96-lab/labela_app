@@ -1,0 +1,6 @@
+Handle,Title,Vendor,Variant SKU,Variant Price,Variant Compare At Price,Variant Grams,Option1 Value,Image Src
+classic-tomato,Classic Tomato Sauce,Acme Foods,TOM-500ML,"2,99","3,49",,500 ml,https://example.com/img1.jpg
+olive-oil,Extra Virgin Olive Oil,Acme Foods,OO-1L,9.90,12.50,1000,1 L,https://example.com/img2.jpg
+flour-1kg,All-purpose Flour,Acme Foods,FL-1KG,"1,29",,1000,1000 g,https://example.com/img3.jpg
+tea-premium,Premium Black Tea,Acme Foods,TEA-200G,"4,50",,200,200 g,https://example.com/img4.jpg
+without-price,No Price Product,Acme Foods,NP-0,,,,,
