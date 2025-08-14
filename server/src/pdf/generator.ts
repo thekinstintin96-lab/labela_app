@@ -229,6 +229,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     }
 
     let cursorY = innerY;
+    let truncatedTitle = false;
+    let truncatedBrand = false;
 
     // Title: up to 2 lines, bold
     if (settings.fieldEnabled?.title !== false) {
@@ -246,6 +248,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
           cursorY += (reservedLines - titleWrapped.lines.length) * (titleLineHeight + (settings.lineGapPt || 0));
         }
       }
+      truncatedTitle = titleWrapped.truncated;
     }
 
     // Brand line with caption
@@ -257,6 +260,7 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       const offBrand = settings.fieldOffsetsMm?.brand || { xMm: 0, yMm: 0 };
       doc.text(brandEllipsis.lines[0], innerX + mm(offBrand.xMm), cursorY + mm(offBrand.yMm), { width: wBrand, lineBreak: false });
       brandLineHeight = doc.currentLineHeight();
+      truncatedBrand = brandEllipsis.truncated;
     }
 
     // QR image aligned top with brand line
@@ -360,8 +364,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     let overflowReason: string | undefined;
     const exceededHeight = cursorY > innerY + innerH;
     if (exceededHeight) overflowReason = 'Vertical overflow';
-    if (titleWrapped.truncated) overflowReason = overflowReason ? `${overflowReason}; Title truncated` : 'Title truncated';
-    if (brandEllipsis.truncated) overflowReason = overflowReason ? `${overflowReason}; Brand truncated` : 'Brand truncated';
+    if (truncatedTitle) overflowReason = overflowReason ? `${overflowReason}; Title truncated` : 'Title truncated';
+    if (truncatedBrand) overflowReason = overflowReason ? `${overflowReason}; Brand truncated` : 'Brand truncated';
 
     if (overflowReason) {
       overflowRows.push(`"${item.title.replaceAll('"', '""')}","${item.brand.replaceAll('"', '""')}","${item.url}","${overflowReason}"`);
