@@ -180,6 +180,12 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     doc.save();
     doc.rect(x0, y0, env.label.width, env.label.height).fill(bgColor);
     doc.restore();
+    if ((style?.borderWidthPt || 0) > 0) {
+      doc.save();
+      doc.lineWidth(style?.borderWidthPt || 0).strokeColor(style?.borderColor || strokeColor);
+      doc.rect(x0, y0, env.label.width, env.label.height).stroke();
+      doc.restore();
+    }
 
     const padding = env.label.padding;
     const innerX = x0 + padding;
@@ -227,8 +233,9 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     // Title: up to 2 lines, bold
     doc.fillColor(textColor).font('Helvetica-Bold').fontSize(fonts.titlePt);
     const titleWrapped = wrapText(doc, item.title, wTitle, 2);
+    const offTitle = settings.fieldOffsetsMm?.title || { xMm: 0, yMm: 0 };
     for (const line of titleWrapped.lines) {
-      doc.text(line, innerX, cursorY, { width: wTitle, lineBreak: false });
+      doc.text(line, innerX + mm(offTitle.xMm), cursorY + mm(offTitle.yMm), { width: wTitle, lineBreak: false });
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
     {
@@ -251,7 +258,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
     const qrX = innerX + leftColW + env.qrGap + mm(settings.qrOffsetMm?.x || 0);
 
     // Draw brand line
-    doc.text(brandEllipsis.lines[0], innerX, cursorY, { width: wBrand, lineBreak: false });
+    const offBrand = settings.fieldOffsetsMm?.brand || { xMm: 0, yMm: 0 };
+    doc.text(brandEllipsis.lines[0], innerX + mm(offBrand.xMm), cursorY + mm(offBrand.yMm), { width: wBrand, lineBreak: false });
 
     // Draw QR
     doc.image(qrBuffer, qrX, qrY, { width: env.qrPx, height: env.qrPx });
@@ -273,7 +281,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       }
       priceText += '…';
     }
-    doc.text(priceText, innerX, cursorY, { width: wPrice, lineBreak: false });
+    const offPrice = settings.fieldOffsetsMm?.price || { xMm: 0, yMm: 0 };
+    doc.text(priceText, innerX + mm(offPrice.xMm), cursorY + mm(offPrice.yMm), { width: wPrice, lineBreak: false });
     cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Old price (strikethrough numeric part)
@@ -283,7 +292,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       const oldPriceValue = formatCurrencyAT(item.compareAtPrice);
       const startX = innerX;
       const y = cursorY + doc.currentLineHeight() * 0.2;
-      doc.text(oldPriceLabel + oldPriceValue, innerX, cursorY, { width: wOld, lineBreak: false });
+      const offOld = settings.fieldOffsetsMm?.oldPrice || { xMm: 0, yMm: 0 };
+      doc.text(oldPriceLabel + oldPriceValue, innerX + mm(offOld.xMm), cursorY + mm(offOld.yMm), { width: wOld, lineBreak: false });
       const labelWidth = doc.widthOfString(oldPriceLabel);
       const valueWidth = doc.widthOfString(oldPriceValue);
       const valueX = startX + labelWidth;
@@ -309,7 +319,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
         }
         upText += '…';
       }
-      doc.text(upText, innerX, cursorY, { width: wUnit, lineBreak: false });
+      const offUnit = settings.fieldOffsetsMm?.unitPrice || { xMm: 0, yMm: 0 };
+      doc.text(upText, innerX + mm(offUnit.xMm), cursorY + mm(offUnit.yMm), { width: wUnit, lineBreak: false });
       cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
     }
 
@@ -322,7 +333,8 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       }
       vatText += '…';
     }
-    doc.text(vatText, innerX, cursorY, { width: wVat, lineBreak: false });
+    const offVat = settings.fieldOffsetsMm?.vat || { xMm: 0, yMm: 0 };
+    doc.text(vatText, innerX + mm(offVat.xMm), cursorY + mm(offVat.yMm), { width: wVat, lineBreak: false });
     cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
 
     // Short description at the bottom
@@ -331,8 +343,9 @@ export async function generatePdf(settings: AppSettings, rows: CsvProductRow[]):
       const maxLines = Math.max(1, settings.shortDescMaxLines ?? 1);
       doc.fillColor(textColor).font('Helvetica').fontSize(fonts.shortDescPt || fonts.brandPt);
       const wrapped = wrapText(doc, item.shortDescription, wShort, maxLines);
+      const offShort = settings.fieldOffsetsMm?.shortDescription || { xMm: 0, yMm: 0 };
       for (const line of wrapped.lines) {
-        doc.text(line, innerX, cursorY, { width: wShort, lineBreak: false });
+        doc.text(line, innerX + mm(offShort.xMm), cursorY + mm(offShort.yMm), { width: wShort, lineBreak: false });
         cursorY += doc.currentLineHeight() + (settings.lineGapPt || 0);
       }
     }

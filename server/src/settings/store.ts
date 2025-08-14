@@ -25,8 +25,8 @@ export const defaultSettings: AppSettings = {
 	qrOffsetMm: { x: 0, y: 5 },
 	captions: defaultCaptions,
 	styles: {
-		default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000' },
-		alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff' },
+		default: { backgroundColor: '#FFFFFF', textColor: '#000000', strokeColor: '#000000', borderWidthPt: 0, borderColor: '#000000' },
+		alternative: { backgroundColor: '#a881d6', textColor: '#ffffff', strokeColor: '#ffffff', borderWidthPt: 0, borderColor: '#ffffff' },
 		condition: 'discount',
 	},
 	fonts: {
@@ -46,6 +46,15 @@ export const defaultSettings: AppSettings = {
 		unitPrice: 100,
 		vat: 100,
 		shortDescription: 115,
+	},
+	fieldOffsetsMm: {
+		title: { xMm: 0, yMm: 0 },
+		brand: { xMm: 0, yMm: 0 },
+		price: { xMm: 0, yMm: 0 },
+		oldPrice: { xMm: 0, yMm: 0 },
+		unitPrice: { xMm: 0, yMm: 0 },
+		vat: { xMm: 0, yMm: 0 },
+		shortDescription: { xMm: 0, yMm: 0 },
 	},
 	brandLogo: {
 		original: { path: 'public/uploads/logo_EowK1JZm.png', widthMm: 13, xMm: 44, yMm: 3, opacity: 1 },

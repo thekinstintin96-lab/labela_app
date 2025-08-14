@@ -10,6 +10,8 @@ export type LabelStyle = {
   backgroundColor: string; // e.g., #FFFFFF
   textColor: string; // e.g., #000000
   strokeColor?: string; // optional line color
+  borderWidthPt?: number;
+  borderColor?: string;
 };
 
 export type LabelFonts = {
@@ -46,6 +48,15 @@ export type AppSettings = {
   };
   fonts?: LabelFonts;
   fieldWidthsPct?: { title: number; brand: number; price: number; oldPrice: number; unitPrice: number; vat: number; shortDescription?: number };
+  fieldOffsetsMm?: {
+    title?: { xMm: number; yMm: number };
+    brand?: { xMm: number; yMm: number };
+    price?: { xMm: number; yMm: number };
+    oldPrice?: { xMm: number; yMm: number };
+    unitPrice?: { xMm: number; yMm: number };
+    vat?: { xMm: number; yMm: number };
+    shortDescription?: { xMm: number; yMm: number };
+  };
   diagonalStrikeForCompare?: boolean;
   shortDescMaxLines?: number;
 };
