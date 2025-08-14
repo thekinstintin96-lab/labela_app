@@ -64,11 +64,15 @@ app.post('/api/settings', async (req, res) => {
     },
     fonts: { ...(current.fonts || {}), ...(incoming.fonts || {}) },
     fieldWidthsPct: { ...(current.fieldWidthsPct || {}), ...(incoming.fieldWidthsPct || {}) },
+    fieldOffsetsMm: { ...(current.fieldOffsetsMm || {}), ...(incoming.fieldOffsetsMm || {}) },
+    fieldEnabled: { ...(current.fieldEnabled || {}), ...(incoming.fieldEnabled || {}) },
     brandLogo: {
       original: { ...(current.brandLogo?.original || {}), ...(incoming.brandLogo?.original || {}) },
       alternative: { ...(current.brandLogo?.alternative || {}), ...(incoming.brandLogo?.alternative || {}) },
     },
     diagonalStrikeForCompare: incoming.diagonalStrikeForCompare ?? current.diagonalStrikeForCompare ?? true,
+    compareStrikeEnabled: incoming.compareStrikeEnabled ?? current.compareStrikeEnabled ?? true,
+    qrBorderEnabled: incoming.qrBorderEnabled ?? current.qrBorderEnabled ?? false,
   } as AppSettings;
   await saveSettings(merged);
   res.json(merged);

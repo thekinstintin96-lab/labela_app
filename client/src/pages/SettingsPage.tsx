@@ -12,8 +12,8 @@ export type Settings = {
   qrSizeMm: number;
   captions: { brand: string; price: string; oldPrice: string; unitPrice: string; vat: string };
   styles?: {
-    default: { backgroundColor: string; textColor: string; strokeColor?: string };
-    alternative: { backgroundColor: string; textColor: string; strokeColor?: string };
+    default: { backgroundColor: string; textColor: string; strokeColor?: string; borderWidthPt?: number; borderColor?: string; borderEnabled?: boolean };
+    alternative: { backgroundColor: string; textColor: string; strokeColor?: string; borderWidthPt?: number; borderColor?: string; borderEnabled?: boolean };
     condition: 'discount';
   };
   fonts?: {
@@ -53,6 +53,26 @@ export type Settings = {
   };
   diagonalStrikeForCompare?: boolean;
   shortDescMaxLines?: number;
+  fieldEnabled?: {
+    title: boolean;
+    brand: boolean;
+    price: boolean;
+    oldPrice: boolean;
+    unitPrice: boolean;
+    vat: boolean;
+    shortDescription: boolean;
+  };
+  fieldOffsetsMm?: {
+    title?: { xMm: number; yMm: number };
+    brand?: { xMm: number; yMm: number };
+    price?: { xMm: number; yMm: number };
+    oldPrice?: { xMm: number; yMm: number };
+    unitPrice?: { xMm: number; yMm: number };
+    vat?: { xMm: number; yMm: number };
+    shortDescription?: { xMm: number; yMm: number };
+  };
+  qrBorderWidthPt?: number;
+  qrBorderEnabled?: boolean;
 };
 
 export function SettingsPage() {
@@ -285,9 +305,71 @@ export function SettingsPage() {
 
           <Card>
             <BlockStack gap="300">
+              <Text as="h3" variant="headingMd">Label border</Text>
+              <InlineGrid columns={3} gap="400">
+                <TextField label="Default border width (pt)" type="number" value={String(settings.styles?.default.borderWidthPt ?? 0)} onChange={(v) => set('styles.default.borderWidthPt', Number(v))} />
+                <TextField label="Default border color" value={settings.styles?.default.borderColor ?? ''} onChange={(v) => set('styles.default.borderColor', v)} />
+                <TextField label="Default border enabled (1/0)" type="number" value={String(settings.styles?.default.borderEnabled ? 1 : 0)} onChange={(v) => set('styles.default.borderEnabled', Number(v) === 1)} />
+
+                <Text as="h4" variant="headingSm">Alternative border</Text>
+                <div />
+                <div />
+                <TextField label="Alternative border width (pt)" type="number" value={String(settings.styles?.alternative.borderWidthPt ?? 0)} onChange={(v) => set('styles.alternative.borderWidthPt', Number(v))} />
+                <TextField label="Alternative border color" value={settings.styles?.alternative.borderColor ?? ''} onChange={(v) => set('styles.alternative.borderColor', v)} />
+                <TextField label="Alternative border enabled (1/0)" type="number" value={String(settings.styles?.alternative.borderEnabled ? 1 : 0)} onChange={(v) => set('styles.alternative.borderEnabled', Number(v) === 1)} />
+              </InlineGrid>
+            </BlockStack>
+          </Card>
+
+          <Card>
+            <BlockStack gap="300">
               <Text as="h3" variant="headingMd">QR Border</Text>
-              <InlineGrid columns={2} gap="400">
+              <InlineGrid columns={3} gap="400">
                 <TextField label="Border width (pt)" type="number" value={String(settings.qrBorderWidthPt ?? 0)} onChange={(v) => set('qrBorderWidthPt', Number(v))} />
+                <TextField label="Border enabled (1/0)" type="number" value={String(settings.qrBorderEnabled ? 1 : 0)} onChange={(v) => set('qrBorderEnabled', Number(v) === 1)} />
+                <div />
+              </InlineGrid>
+            </BlockStack>
+          </Card>
+
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h3" variant="headingMd">Field visibility (1=on/0=off) and offsets (mm)</Text>
+              <InlineGrid columns={4} gap="400">
+                <Text as="h4" variant="headingSm">Title</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.title ? 1 : 0)} onChange={(v) => set('fieldEnabled.title', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.title?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.title.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.title?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.title.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">Brand</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.brand ? 1 : 0)} onChange={(v) => set('fieldEnabled.brand', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.brand?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.brand.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.brand?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.brand.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">Price</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.price ? 1 : 0)} onChange={(v) => set('fieldEnabled.price', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.price?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.price.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.price?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.price.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">Old price</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.oldPrice ? 1 : 0)} onChange={(v) => set('fieldEnabled.oldPrice', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.oldPrice?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.oldPrice.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.oldPrice?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.oldPrice.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">Unit price</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.unitPrice ? 1 : 0)} onChange={(v) => set('fieldEnabled.unitPrice', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.unitPrice?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.unitPrice.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.unitPrice?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.unitPrice.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">VAT</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.vat ? 1 : 0)} onChange={(v) => set('fieldEnabled.vat', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.vat?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.vat.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.vat?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.vat.yMm', Number(v))} />
+
+                <Text as="h4" variant="headingSm">Short description</Text>
+                <TextField label="Enabled" type="number" value={String(settings.fieldEnabled?.shortDescription ? 1 : 0)} onChange={(v) => set('fieldEnabled.shortDescription', Number(v) === 1)} />
+                <TextField label="X (mm)" type="number" value={String(settings.fieldOffsetsMm?.shortDescription?.xMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.shortDescription.xMm', Number(v))} />
+                <TextField label="Y (mm)" type="number" value={String(settings.fieldOffsetsMm?.shortDescription?.yMm ?? 0)} onChange={(v) => set('fieldOffsetsMm.shortDescription.yMm', Number(v))} />
               </InlineGrid>
             </BlockStack>
           </Card>
